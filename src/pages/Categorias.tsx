@@ -93,6 +93,7 @@ const Categorias = () => {
       tipo: novoTipo,
       cor: novaCor,
       icone: "DollarSign",
+      descricao: novaDescricao,
     });
 
     // Limpar formulário
@@ -350,7 +351,7 @@ const Categorias = () => {
                           </span>
                         </TableCell>
                         <TableCell className="text-gray-600">
-                          Sem descrição
+                          {categoria.descricao || "Sem descrição"}
                         </TableCell>
                         <TableCell>
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -427,7 +428,7 @@ const Categorias = () => {
                               {categoria.nome}
                             </h3>
                             <p className="text-sm text-gray-500">
-                              Sem descrição
+                              {categoria.descricao || "Sem descrição"}
                             </p>
                           </div>
                         </div>
