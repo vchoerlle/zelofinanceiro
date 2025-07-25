@@ -111,13 +111,19 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="py-0 px-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/logo.png" 
-                alt="Guarda Conta Logo" 
-                className={`h-48 transition-all duration-300 ${
-                  isCollapsed ? "w-48" : "w-auto"
-                }`}
-              />
+              {isCollapsed ? (
+                <img 
+                  src="/logo-icon.png" 
+                  alt="Guarda Conta Icon" 
+                  className="h-8 w-8 transition-all duration-300"
+                />
+              ) : (
+                <img 
+                  src="/logo-full.png" 
+                  alt="Guarda Conta Logo" 
+                  className="h-48 w-auto transition-all duration-300"
+                />
+              )}
             </div>
 
             {/* Mobile Close Button */}

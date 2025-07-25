@@ -112,6 +112,7 @@ const Dashboard = () => {
         totalDespesas: 0,
         saldoPeriodo: 0,
         percentualDespesas: 0,
+        totalReceitasAnterior: 0,
       };
     }
 
@@ -142,9 +143,43 @@ const Dashboard = () => {
       .filter((t) => t.tipo === "despesa")
       .reduce((total, transacao) => total + Number(transacao.valor), 0);
 
+    // Calcula o período anterior
+    const getPeriodoAnterior = () => {
+      const hoje = new Date();
+      switch (selectedPeriod) {
+        case "dia":
+          return new Date(hoje.setDate(hoje.getDate() - 1)).toISOString().split('T')[0];
+        case "semana":
+          return new Date(hoje.setDate(hoje.getDate() - 7)).toISOString().split('T')[0];
+        case "mes":
+          return new Date(hoje.setMonth(hoje.getMonth() - 1)).toISOString().split('T')[0];
+        case "ano":
+          return new Date(hoje.setFullYear(hoje.getFullYear() - 1)).toISOString().split('T')[0];
+        default:
+          return '';
+      }
+    };
+
+    // Calcula receitas do período anterior
+    const totalReceitasAnterior = transacoes
+      .filter(t => {
+        const dataTransacao = t.data.split('T')[0];
+        const inicioPeriodoAnterior = getPeriodoAnterior();
+        return t.tipo === "receita" && dataTransacao >= inicioPeriodoAnterior;
+      })
+      .reduce((total, transacao) => total + Number(transacao.valor), 0);
+
     const saldoPeriodo = totalReceitas - totalDespesas;
-    const percentualDespesas =
-      totalReceitas > 0 ? (totalDespesas / totalReceitas) * 100 : 0;
+    
+    // Percentual do saldo em relação à receita total
+    const percentualSaldo = totalReceitas > 0 
+      ? Number(((saldoPeriodo / totalReceitas) * 100).toFixed(1))
+      : 0;
+
+    // Percentual das despesas em relação às receitas
+    const percentualDespesas = totalReceitas > 0 
+      ? Number(((totalDespesas / totalReceitas) * 100).toFixed(1))
+      : 0;
 
     return {
       transacoesFiltradas: transacoesFiltradas.sort((a, b) =>
@@ -153,7 +188,9 @@ const Dashboard = () => {
       totalReceitas,
       totalDespesas,
       saldoPeriodo,
+      percentualSaldo,
       percentualDespesas,
+      totalReceitasAnterior,
     };
   }, [transacoes, selectedPeriod, loadingTransacoes]);
 
@@ -162,7 +199,9 @@ const Dashboard = () => {
     totalReceitas,
     totalDespesas,
     saldoPeriodo,
+    percentualSaldo,
     percentualDespesas,
+    totalReceitasAnterior,
   } = processedData;
 
   // Função para obter ícone da categoria
@@ -199,9 +238,6 @@ const Dashboard = () => {
     };
     return cores.default;
   };
-
-  // Cálculos adicionais
-  const despesasPendentes = totalDespesas * 0.1; // Estimativa
 
   // Itens com estoque baixo (usar nomes corretos das propriedades)
   const itensEstoqueBaixo = itensMercado.filter(
@@ -270,16 +306,12 @@ const Dashboard = () => {
       value: `R$ ${totalReceitas.toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
-      change: "+12.4%",
-      changeType: "positive",
+      changeType: "neutral",
       icon: TrendingUp,
-    },
+  },
     {
       title: "Despesas do período",
       value: `R$ ${totalDespesas.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-      })}`,
-      subtitle: `Pendente: R$ ${despesasPendentes.toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
       changeType: "neutral",
@@ -290,9 +322,9 @@ const Dashboard = () => {
       value: `R$ ${saldoPeriodo.toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
       })}`,
-      change: "+29.7%",
-      changeType: "positive",
-      icon: TrendingUp,
+    change: `${saldoPeriodo >= 0 ? "+" : ""}${percentualSaldo}%`,
+    changeType: saldoPeriodo >= 0 ? "positive" : "negative",
+    icon: saldoPeriodo >= 0 ? TrendingUp : TrendingDown,
     },
     {
       title: "Despesas/Receitas",
@@ -383,11 +415,6 @@ const Dashboard = () => {
                 <p className="text-lg md:text-2xl font-bold text-gray-900">
                   {stat.value}
                 </p>
-                {stat.subtitle && (
-                  <p className="text-xs md:text-sm text-orange-600">
-                    {stat.subtitle}
-                  </p>
-                )}
                 {stat.change && (
                   <p
                     className={`text-xs md:text-sm ${
