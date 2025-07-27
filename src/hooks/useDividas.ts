@@ -17,6 +17,7 @@ export interface Divida {
   credor: string;
   created_at: string;
   updated_at: string;
+  categoria?: string; // ✅ Adicionar campo categoria para compatibilidade com o modal
   categorias?: {
     nome: string;
     cor: string;

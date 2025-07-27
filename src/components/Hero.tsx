@@ -24,7 +24,7 @@ export const Hero = () => {
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            O Mordomo é a plataforma completa para gerenciar suas finanças pessoais e empresariais. 
+            O Guarda Conta é a plataforma completa para gerenciar suas finanças pessoais e empresariais. 
             Dashboard intuitivo, relatórios detalhados e agora com assistente no WhatsApp.
           </p>
           
@@ -48,7 +48,7 @@ export const Hero = () => {
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
             <img 
               src="https://cdn.jsdelivr.net/gh/mathuzabr/img-packtypebot/mordomo.jpg" 
-              alt="Dashboard do Mordomo"
+              alt="Dashboard do Guarda Conta"
               className="w-full h-auto rounded-lg"
             />
           </div>

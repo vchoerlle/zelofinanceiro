@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { DashboardLayout } from "@/components/DashboardLayout";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,17 +33,32 @@ import {
   Trash2,
   Filter,
   Download,
+  DollarSign,
+  Briefcase,
+  ShoppingBag,
+  Home,
+  Utensils,
+  Car,
+  Heart,
+  BookOpen,
+  Gamepad2,
+  Shirt,
+  Smartphone,
+  Settings,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
+import { renderIcon } from "@/lib/icon-utils";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { EditarCategoriaModal } from "@/components/EditarCategoriaModal";
 
 interface Categoria {
   id: string;
   nome: string;
   tipo: "receita" | "despesa";
   cor: string;
-  descricao: string;
-  ativa: boolean;
+  icone: string;
+  descricao?: string | null;
 }
 
 const Categorias = () => {
@@ -61,6 +75,25 @@ const Categorias = () => {
   const [novoTipo, setNovoTipo] = useState<"receita" | "despesa">("receita");
   const [novaCor, setNovaCor] = useState("#10B981");
   const [novaDescricao, setNovaDescricao] = useState("");
+  const [novoIcone, setNovoIcone] = useState("DollarSign");
+
+  // 1. Adicionar estado para modal de edição
+  const [categoriaEditando, setCategoriaEditando] = useState<Categoria | null>(null);
+  const [modalEditarAberto, setModalEditarAberto] = useState(false);
+
+  // 2. Função para abrir modal
+  const abrirModalEditar = (categoria: Categoria) => {
+    setCategoriaEditando(categoria);
+    setModalEditarAberto(true);
+  };
+
+  // 3. Função para salvar edição
+  const handleSalvarEdicao = async (dadosEditados: Partial<Categoria>) => {
+    if (!categoriaEditando) return;
+    await updateCategoria(categoriaEditando.id, dadosEditados);
+    setModalEditarAberto(false);
+    setCategoriaEditando(null);
+  };
 
   const categoriasFiltradas = categorias.filter((categoria) => {
     const matchNome = categoria.nome
@@ -88,12 +121,26 @@ const Categorias = () => {
       return;
     }
 
+    // ✅ Verificar se já existe uma categoria com o mesmo nome e tipo
+    const categoriaExistente = categorias.find(
+      cat => cat.nome.toLowerCase().trim() === novoNome.toLowerCase().trim() && cat.tipo === novoTipo
+    );
+
+    if (categoriaExistente) {
+      toast({
+        title: "Erro",
+        description: `Já existe uma categoria "${novoNome}" do tipo "${novoTipo}".`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     await createCategoria({
       nome: novoNome,
       tipo: novoTipo,
       cor: novaCor,
-      icone: "DollarSign",
-      descricao: novaDescricao,
+      icone: novoIcone,
+      descricao: novaDescricao || null,
     });
 
     // Limpar formulário
@@ -101,6 +148,7 @@ const Categorias = () => {
     setNovoTipo("receita");
     setNovaCor("#10B981");
     setNovaDescricao("");
+    setNovoIcone("DollarSign");
 
     setActiveTab("lista");
   };
@@ -110,6 +158,7 @@ const Categorias = () => {
     setNovoTipo("receita");
     setNovaCor("#10B981");
     setNovaDescricao("");
+    setNovoIcone("DollarSign");
     setActiveTab("lista");
   };
 
@@ -126,35 +175,57 @@ const Categorias = () => {
   };
 
   const handleImportarCategoriasPadrao = async () => {
-    type CategoriaPadrao = { nome: string; tipo: "receita" | "despesa"; cor: string; icone: string; };
+    type CategoriaPadrao = { nome: string; tipo: "receita" | "despesa"; cor: string; icone: string; descricao?: string; };
     const categoriasPadrao: CategoriaPadrao[] = [
       // Receitas
-      { nome: 'Salário', tipo: 'receita', cor: '#10B981', icone: 'DollarSign' },
-      { nome: 'Freelance', tipo: 'receita', cor: '#3B82F6', icone: 'Briefcase' },
-      { nome: 'Investimentos', tipo: 'receita', cor: '#8B5CF6', icone: 'TrendingUp' },
-      { nome: 'Vendas', tipo: 'receita', cor: '#F59E0B', icone: 'ShoppingBag' },
-      { nome: 'Aluguel Recebido', tipo: 'receita', cor: '#059669', icone: 'Home' },
+      { nome: 'Salário', tipo: 'receita', cor: '#10B981', icone: 'DollarSign', descricao: 'Rendimentos do trabalho principal' },
+      { nome: 'Freelance', tipo: 'receita', cor: '#3B82F6', icone: 'Briefcase', descricao: 'Trabalhos extras e projetos freelancer' },
+      { nome: 'Investimentos', tipo: 'receita', cor: '#8B5CF6', icone: 'TrendingUp', descricao: 'Rendimentos de aplicações financeiras' },
+      { nome: 'Vendas', tipo: 'receita', cor: '#F59E0B', icone: 'ShoppingBag', descricao: 'Vendas de produtos ou serviços' },
+      { nome: 'Aluguel Recebido', tipo: 'receita', cor: '#059669', icone: 'Home', descricao: 'Rendimentos de aluguel de imóveis' },
       // Despesas
-      { nome: 'Alimentação', tipo: 'despesa', cor: '#EF4444', icone: 'Utensils' },
-      { nome: 'Transporte', tipo: 'despesa', cor: '#F97316', icone: 'Car' },
-      { nome: 'Moradia', tipo: 'despesa', cor: '#6366F1', icone: 'Home' },
-      { nome: 'Saúde', tipo: 'despesa', cor: '#EC4899', icone: 'Heart' },
-      { nome: 'Educação', tipo: 'despesa', cor: '#14B8A6', icone: 'BookOpen' },
-      { nome: 'Lazer', tipo: 'despesa', cor: '#8B5CF6', icone: 'Gamepad2' },
-      { nome: 'Roupas', tipo: 'despesa', cor: '#F59E0B', icone: 'Shirt' },
-      { nome: 'Tecnologia', tipo: 'despesa', cor: '#6B7280', icone: 'Smartphone' },
-      { nome: 'Serviços', tipo: 'despesa', cor: '#84CC16', icone: 'Settings' },
+      { nome: 'Alimentação', tipo: 'despesa', cor: '#EF4444', icone: 'Utensils', descricao: 'Gastos com alimentação e refeições' },
+      { nome: 'Transporte', tipo: 'despesa', cor: '#F97316', icone: 'Car', descricao: 'Combustível, transporte público e manutenção' },
+      { nome: 'Moradia', tipo: 'despesa', cor: '#6366F1', icone: 'Home', descricao: 'Aluguel, condomínio e despesas da casa' },
+      { nome: 'Saúde', tipo: 'despesa', cor: '#EC4899', icone: 'Heart', descricao: 'Consultas médicas, medicamentos e planos de saúde' },
+      { nome: 'Educação', tipo: 'despesa', cor: '#14B8A6', icone: 'BookOpen', descricao: 'Cursos, livros e despesas educacionais' },
+      { nome: 'Lazer', tipo: 'despesa', cor: '#8B5CF6', icone: 'Gamepad2', descricao: 'Entretenimento, hobbies e diversão' },
+      { nome: 'Roupas', tipo: 'despesa', cor: '#F59E0B', icone: 'Shirt', descricao: 'Vestuário, calçados e acessórios' },
+      { nome: 'Tecnologia', tipo: 'despesa', cor: '#6B7280', icone: 'Smartphone', descricao: 'Dispositivos eletrônicos e tecnologia' },
+      { nome: 'Serviços', tipo: 'despesa', cor: '#84CC16', icone: 'Settings', descricao: 'Serviços diversos e manutenções' },
+      { nome: 'Outros', tipo: 'despesa', cor: '#84CC16', icone: 'Settings', descricao: 'Outras despesas não categorizadas' },
     ];
 
     try {
-      // O hook useCategorias já lida com o user_id
+      let categoriasCriadas = 0;
+      let categoriasIgnoradas = 0;
+
+      // ✅ Verificar duplicatas antes de importar
       for (const categoria of categoriasPadrao) {
+        const categoriaExistente = categorias.find(
+          cat => cat.nome.toLowerCase().trim() === categoria.nome.toLowerCase().trim() && cat.tipo === categoria.tipo
+        );
+
+        if (categoriaExistente) {
+          categoriasIgnoradas++;
+          continue; // Pular categorias que já existem
+        }
+
         await createCategoria(categoria);
+        categoriasCriadas++;
       }
-      toast({
-        title: "Sucesso!",
-        description: "Categorias padrão importadas com sucesso.",
-      });
+
+      if (categoriasCriadas > 0) {
+        toast({
+          title: "Sucesso!",
+          description: `${categoriasCriadas} categorias padrão importadas com sucesso.${categoriasIgnoradas > 0 ? ` ${categoriasIgnoradas} categorias já existiam e foram ignoradas.` : ''}`,
+        });
+      } else {
+        toast({
+          title: "Importação concluída",
+          description: "Todas as categorias padrão já existem no seu sistema.",
+        });
+      }
     } catch (error) {
       console.error("Erro ao importar categorias padrão:", error);
       toast({
@@ -334,6 +405,7 @@ const Categorias = () => {
                               className="w-4 h-4 rounded-full"
                               style={{ backgroundColor: categoria.cor }}
                             />
+                            {renderIcon(categoria.icone)}
                             <span>{categoria.nome}</span>
                           </div>
                         </TableCell>
@@ -360,6 +432,14 @@ const Categorias = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              onClick={() => abrirModalEditar(categoria)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button
@@ -423,6 +503,7 @@ const Categorias = () => {
                             className="w-4 h-4 rounded-full"
                             style={{ backgroundColor: categoria.cor }}
                           />
+                          {renderIcon(categoria.icone)}
                           <div>
                             <h3 className="font-medium text-gray-900">
                               {categoria.nome}
@@ -448,6 +529,14 @@ const Categorias = () => {
                           Ativa
                         </span>
                         <div className="flex space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                            onClick={() => abrirModalEditar(categoria)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -528,6 +617,50 @@ const Categorias = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="descricao">Descrição</Label>
+                    <Input
+                      id="descricao"
+                      placeholder="Descrição opcional..."
+                      value={novaDescricao}
+                      onChange={(e) => setNovaDescricao(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="icone">Ícone</Label>
+                    <select
+                      id="icone"
+                      value={novoIcone}
+                      onChange={(e) => setNovoIcone(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                      <option value="DollarSign">💰 DollarSign</option>
+                      <option value="CreditCard">💳 CreditCard</option>
+                      <option value="PiggyBank">🏦 PiggyBank</option>
+                      <option value="Wallet">👛 Wallet</option>
+                      <option value="Banknote">💵 Banknote</option>
+                      <option value="Coins">🪙 Coins</option>
+                      <option value="Receipt">🧾 Receipt</option>
+                      <option value="Calculator">🧮 Calculator</option>
+                      <option value="ChartBar">📊 ChartBar</option>
+                      <option value="TrendingUp">📈 TrendingUp</option>
+                      <option value="TrendingDown">📉 TrendingDown</option>
+                      <option value="Target">🎯 Target</option>
+                      <option value="Briefcase">💼 Briefcase</option>
+                      <option value="ShoppingBag">🛍️ ShoppingBag</option>
+                      <option value="Home">🏠 Home</option>
+                      <option value="Utensils">🍽️ Utensils</option>
+                      <option value="Car">🚗 Car</option>
+                      <option value="Heart">❤️ Heart</option>
+                      <option value="BookOpen">📚 BookOpen</option>
+                      <option value="Gamepad2">🎮 Gamepad2</option>
+                      <option value="Shirt">👕 Shirt</option>
+                      <option value="Smartphone">📱 Smartphone</option>
+                      <option value="Settings">⚙️ Settings</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="cor">Cor</Label>
                     <div className="flex items-center space-x-2">
                       <input
@@ -552,16 +685,6 @@ const Categorias = () => {
                       </div>
                     </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="descricao">Descrição</Label>
-                    <Input
-                      id="descricao"
-                      placeholder="Descrição opcional..."
-                      value={novaDescricao}
-                      onChange={(e) => setNovaDescricao(e.target.value)}
-                    />
-                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4">
@@ -584,6 +707,19 @@ const Categorias = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal de edição */}
+      {modalEditarAberto && categoriaEditando && (
+        <EditarCategoriaModal
+          categoria={categoriaEditando}
+          open={modalEditarAberto}
+          onOpenChange={(open) => {
+            setModalEditarAberto(open);
+            if (!open) setCategoriaEditando(null);
+          }}
+          onSave={handleSalvarEdicao}
+        />
+      )}
     </DashboardLayout>
   );
 };

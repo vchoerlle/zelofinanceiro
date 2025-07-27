@@ -39,24 +39,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDividas } from "@/hooks/useDividas";
 import { EditarDividaModal } from "@/components/EditarDividaModal";
-
-interface Divida {
-  id: string;
-  descricao: string;
-  valor_total: number;
-  valor_pago: number;
-  valor_restante: number;
-  data_vencimento: string;
-  parcelas: number;
-  parcelas_pagas: number;
-  status: "pendente" | "vencida" | "quitada";
-  categoria_id?: string;
-  credor: string;
-  categorias?: {
-    id: string;
-    nome: string;
-  };
-}
+import { renderIcon } from "@/lib/icon-utils";
+import type { Divida } from "@/hooks/useDividas";
 
 const Dividas = () => {
   const { toast } = useToast();
@@ -181,6 +165,7 @@ const Dividas = () => {
   };
 
   const handleSalvarEdicao = async (dividaEditada: Divida) => {
+    // ✅ Corrigir: buscar categoria pelo nome correto
     const categoria = categoriasDespesa.find(
       (c) => c.nome === dividaEditada.categoria
     );
@@ -408,7 +393,14 @@ const Dividas = () => {
                         </TableCell>
                         <TableCell>{divida.credor}</TableCell>
                         <TableCell>
-                          {divida.categorias?.nome || "Sem categoria"}
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: divida.categorias?.cor || "#6B7280" }}
+                            />
+                            {divida.categorias?.icone && renderIcon(divida.categorias.icone)}
+                            <span>{divida.categorias?.nome || "Sem categoria"}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           {divida.parcelas_pagas}/{divida.parcelas}
@@ -521,9 +513,16 @@ const Dividas = () => {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-gray-500">Categoria</p>
-                          <p className="font-medium">
-                            {divida.categorias?.nome || "Sem categoria"}
-                          </p>
+                          <div className="flex items-center space-x-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: divida.categorias?.cor || "#6B7280" }}
+                            />
+                            {divida.categorias?.icone && renderIcon(divida.categorias.icone)}
+                            <p className="font-medium">
+                              {divida.categorias?.nome || "Sem categoria"}
+                            </p>
+                          </div>
                         </div>
                         <div>
                           <p className="text-gray-500">Parcelas</p>

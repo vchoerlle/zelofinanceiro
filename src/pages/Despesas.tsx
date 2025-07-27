@@ -38,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDespesas } from "@/hooks/useDespesas";
 import { EditarDespesaModal } from "@/components/EditarDespesaModal";
+import { renderIcon } from "@/lib/icon-utils";
 
 interface Despesa {
   id: string;
@@ -312,7 +313,14 @@ const Despesas = () => {
                           {despesa.descricao}
                         </TableCell>
                         <TableCell>
-                          {despesa.categorias?.nome || "Sem categoria"}
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: despesa.categorias?.cor || "#6B7280" }}
+                            />
+                            {despesa.categorias?.icone && renderIcon(despesa.categorias.icone)}
+                            <span>{despesa.categorias?.nome || "Sem categoria"}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -401,9 +409,16 @@ const Despesas = () => {
                           <h3 className="font-medium text-gray-900">
                             {despesa.descricao}
                           </h3>
-                          <p className="text-sm text-gray-500">
-                            {despesa.categorias?.nome || "Sem categoria"}
-                          </p>
+                          <div className="flex items-center space-x-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: despesa.categorias?.cor || "#6B7280" }}
+                            />
+                            {despesa.categorias?.icone && renderIcon(despesa.categorias.icone)}
+                            <p className="text-sm text-gray-500">
+                              {despesa.categorias?.nome || "Sem categoria"}
+                            </p>
+                          </div>
                         </div>
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           Despesa

@@ -45,7 +45,7 @@ import {
 import { NovoItemMercadoModal } from "@/components/NovoItemMercadoModal";
 import { EditarItemMercadoModal } from "@/components/EditarItemMercadoModal";
 import { NovaCategoriaModal } from "@/components/NovaCategoriaModal";
-import { EditarCategoriaModal } from "@/components/EditarCategoriaModal";
+import { EditarCategoriaMercadoModal } from "@/components/EditarCategoriaMercadoModal";
 import { EditarOrcamentoModal } from "@/components/EditarOrcamentoModal";
 import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
@@ -969,7 +969,7 @@ const Mercado = () => {
           onEditarItem={handleEditarItem}
         />
 
-        <EditarCategoriaModal
+        <EditarCategoriaMercadoModal
           categoria={categoriaParaEditar}
           open={modalEditarCategoriaAberto}
           onOpenChange={setModalEditarCategoriaAberto}

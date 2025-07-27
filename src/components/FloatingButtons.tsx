@@ -23,7 +23,7 @@ export const FloatingButtons = () => {
   };
 
   const openWhatsApp = () => {
-    window.open("https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o Mordomo.", "_blank");
+    window.open("https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o Guarda Conta.", "_blank");
   };
 
   return (

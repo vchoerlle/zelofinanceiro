@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useTransacoes } from "@/hooks/useTransacoes";
+import { renderIcon } from "@/lib/icon-utils";
 
 interface Transacao {
   id: string;
@@ -244,7 +245,14 @@ const Transacoes = () => {
                       {transacao.descricao}
                     </TableCell>
                     <TableCell>
-                      {transacao.categorias?.nome || "Sem categoria"}
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: transacao.categorias?.cor || "#6B7280" }}
+                        />
+                        {transacao.categorias?.icone && renderIcon(transacao.categorias.icone)}
+                        <span>{transacao.categorias?.nome || "Sem categoria"}</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <span
@@ -298,9 +306,14 @@ const Transacoes = () => {
                       <h3 className="font-medium text-gray-900">
                         {transacao.descricao}
                       </h3>
-                      <p className="text-sm text-gray-500">
-                        {transacao.categorias?.nome || "Sem categoria"}
-                      </p>
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: transacao.categorias?.cor || "#6B7280" }}
+                        />
+                        {transacao.categorias?.icone && renderIcon(transacao.categorias.icone)}
+                        <p className="text-sm text-gray-500">{transacao.categorias?.nome || "Sem categoria"}</p>
+                      </div>
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${

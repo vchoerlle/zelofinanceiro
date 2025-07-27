@@ -38,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useReceitas } from "@/hooks/useReceitas";
 import { EditarReceitaModal } from "@/components/EditarReceitaModal";
+import { renderIcon } from "@/lib/icon-utils";
 
 interface Receita {
   id: string;
@@ -312,7 +313,14 @@ const Receitas = () => {
                           {receita.descricao}
                         </TableCell>
                         <TableCell>
-                          {receita.categorias?.nome || "Sem categoria"}
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: receita.categorias?.cor || "#6B7280" }}
+                            />
+                            {receita.categorias?.icone && renderIcon(receita.categorias.icone)}
+                            <span>{receita.categorias?.nome || "Sem categoria"}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -408,9 +416,16 @@ const Receitas = () => {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-gray-500">Categoria</p>
-                          <p className="font-medium">
-                            {receita.categorias?.nome || "Sem categoria"}
-                          </p>
+                          <div className="flex items-center space-x-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: receita.categorias?.cor || "#6B7280" }}
+                            />
+                            {receita.categorias?.icone && renderIcon(receita.categorias.icone)}
+                            <p className="font-medium">
+                              {receita.categorias?.nome || "Sem categoria"}
+                            </p>
+                          </div>
                         </div>
                         <div>
                           <p className="text-gray-500">Data</p>

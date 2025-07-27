@@ -1,4 +1,4 @@
-# 🏦 Mordomo - Controle Financeiro Inteligente
+# 🏦 Guarda Conta - Controle Financeiro Inteligente
 
 > **Gerencie suas finanças de forma simples e inteligente com dashboard intuitivo, relatórios detalhados e assistente integrado.**
 
@@ -9,7 +9,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Mordomo** é uma aplicação web moderna para controle financeiro pessoal e empresarial, desenvolvida com foco na simplicidade e eficiência. Com interface intuitiva e recursos avançados, oferece uma solução completa para gestão de finanças.
+O **Guarda Conta** é uma aplicação web moderna para controle financeiro pessoal e empresarial, desenvolvida com foco na simplicidade e eficiência. Com interface intuitiva e recursos avançados, oferece uma solução completa para gestão de finanças.
 
 ### 🎯 Objetivos
 
@@ -102,8 +102,8 @@ as-mordomo/
 1. **Clone o repositório**
 
 ```bash
-git clone [https://github.com/URL-DO-SEU-REPOSITORIO/mordomo.git]
-cd mordomo-main
+git clone [https://github.com/URL-DO-SEU-REPOSITORIO/guarda-conta.git]
+cd guarda-conta-main
 ```
 
 2. **Instale as dependências**
@@ -145,7 +145,7 @@ Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
 # Configurações da aplicação
-VITE_APP_NAME=Mordomo
+VITE_APP_NAME=Guarda Conta
 VITE_API_URL=http://localhost:3000/api
 
 # Configurações de terceiros (se aplicável)
@@ -205,7 +205,7 @@ export function MeuComponente({ titulo, valor, onAction }: ComponenteProps) {
 
 ## 👨‍💻 Autor
 
-**Equipe Mordomo**
+**Equipe Guarda Conta**
 
 - 🌐 Website: [clubdosoftware.com.br](https://clubdosoftware.com.br)
 
@@ -215,6 +215,6 @@ export function MeuComponente({ titulo, valor, onAction }: ComponenteProps) {
 
 **Feito com ❤️ para simplificar sua vida financeira**
 
-[🏠 Home](https://clubdosoftware.com.br) • [📚 Docs](https://clubdosoftware.com.br/mordomo.html)
+[🏠 Home](https://clubdosoftware.com.br) • [📚 Docs](https://clubdosoftware.com.br/guarda-conta.html)
 
 </div>

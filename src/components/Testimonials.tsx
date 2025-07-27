@@ -7,7 +7,7 @@ export const Testimonials = () => {
     {
       name: "Maria Silva",
       role: "Empresária",
-      content: "O Mordomo transformou como eu gerencio minhas finanças. Agora tenho controle total sobre meus gastos e receitas.",
+      content: "O Guarda Conta transformou como eu gerencio minhas finanças. Agora tenho controle total sobre meus gastos e receitas.",
       rating: 5,
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b75c?w=150&h=150&fit=crop&crop=face"
     },
@@ -33,7 +33,7 @@ export const Testimonials = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">O QUE DIZEM NOSSOS USUÁRIOS</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Milhares de pessoas já transformaram suas finanças com o Mordomo
+            Milhares de pessoas já transformaram suas finanças com o Guarda Conta
           </p>
         </div>
 
