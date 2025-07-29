@@ -77,7 +77,7 @@ export const NovoItemListaModal = ({ isOpen, onClose, onSave }: NovoItemListaMod
                 id="unidade_medida"
                 value={formData.unidade_medida}
                 onChange={(e) => setFormData({...formData, unidade_medida: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="un">Unidade</option>
                 <option value="kg">Quilograma</option>

@@ -411,7 +411,7 @@ const Dashboard = () => {
               </span>
             </div>
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+              <h1 className="text-xl md:text-2xl font-bold text-foreground">
                 Olá, {user.name}
               </h1>
               <p className="text-sm md:text-base text-gray-600">
@@ -464,7 +464,7 @@ const Dashboard = () => {
                     />
                   )}
                 </div>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   {stat.value}
                 </p>
                 {stat.change && (
@@ -515,7 +515,7 @@ const Dashboard = () => {
         {/* Recent Transactions */}
         <Card className="p-4 md:p-6 mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">
+                            <h2 className="text-lg md:text-xl font-bold text-foreground">
               Últimas Transações - {selectedPeriod}
             </h2>
             <Button
@@ -531,14 +531,14 @@ const Dashboard = () => {
               transacoesParaExibicao.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 rounded-lg border border-gray-100 hover:bg-gray-50 gap-2 sm:gap-4"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 rounded-lg border border-border hover:bg-accent gap-2 sm:gap-4"
                 >
                   <div className="flex items-center space-x-3 md:space-x-4">
                     <div className="p-2 rounded-lg bg-primary/20">
                       <transaction.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm md:text-base font-medium text-gray-900">
+                      <p className="text-sm md:text-base font-medium text-foreground">
                         {transaction.description}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600">
@@ -580,7 +580,7 @@ const Dashboard = () => {
                   <Package className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-base md:text-lg font-bold text-gray-900">
+                  <h3 className="text-base md:text-lg font-bold text-foreground">
                     Estoque Baixo
                   </h3>
                   <p className="text-xs md:text-sm text-gray-600">
@@ -613,7 +613,7 @@ const Dashboard = () => {
                       }`}
                     ></div>
                     <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-900">
+                      <p className="text-xs md:text-sm font-medium text-foreground">
                         {item.descricao}
                       </p>
                       <p className="text-xs text-gray-600">
@@ -646,7 +646,7 @@ const Dashboard = () => {
                   <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-base md:text-lg font-bold text-gray-900">
+                  <h3 className="text-base md:text-lg font-bold text-foreground">
                     Parcelamentos Vencidos
                   </h3>
                   <p className="text-xs md:text-sm text-gray-600">
@@ -676,7 +676,7 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                     <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-900">
+                      <p className="text-xs md:text-sm font-medium text-foreground">
                         {divida.descricao}
                       </p>
                       <p className="text-xs text-gray-600">
@@ -699,7 +699,7 @@ const Dashboard = () => {
         {/* Veículos Card */}
         <Card className="p-4 md:p-6">
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 flex items-center">
+            <h2 className="text-lg md:text-xl font-bold text-foreground flex items-center">
               <Car className="w-4 h-4 md:w-5 md:h-5 mr-2 text-orange-500" />
               Meus Veículos
             </h2>
@@ -720,14 +720,14 @@ const Dashboard = () => {
               veiculos.map((veiculo) => (
                 <div
                   key={veiculo.id}
-                  className="flex items-center justify-between p-3 md:p-4 rounded-lg border border-gray-100 hover:bg-gray-50"
+                  className="flex items-center justify-between p-3 md:p-4 rounded-lg border border-border hover:bg-accent"
                 >
                   <div className="flex items-center space-x-3 md:space-x-4">
                     <div className="p-2 rounded-lg bg-orange-500 bg-opacity-20">
                       <Car className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                     </div>
                     <div>
-                      <p className="text-sm md:text-base font-medium text-gray-900">
+                      <p className="text-sm md:text-base font-medium text-foreground">
                         {veiculo.marca} {veiculo.modelo}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600">

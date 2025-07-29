@@ -21,12 +21,12 @@ export const FeatureCard = ({ icon: Icon, title, description, color }: FeatureCa
   const colorClass = colorVariants[color as keyof typeof colorVariants] || colorVariants.blue;
   
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="bg-background p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-border">
       <div className={`w-16 h-16 rounded-xl flex items-center justify-center mb-6 ${colorClass}`}>
         <Icon className="w-8 h-8" />
       </div>
       
-      <h3 className="text-xl font-bold text-gray-900 mb-4">{title}</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">{title}</h3>
       <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   );

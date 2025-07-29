@@ -242,7 +242,7 @@ const Dividas = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Parcelamentos
             </h1>
             <p className="text-sm md:text-base text-gray-600">
@@ -340,7 +340,7 @@ const Dividas = () => {
           <TabsContent value="lista" className="space-y-4 md:space-y-6">
             {/* Filtros */}
             <Card className="p-4 md:p-6">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">
+              <h2 className="text-base md:text-lg font-bold text-foreground mb-4">
                 Filtros
               </h2>
               <div className="flex flex-col space-y-4">
@@ -359,7 +359,7 @@ const Dividas = () => {
                     title="Filtrar por status"
                     value={statusFiltro}
                     onChange={(e) => setStatusFiltro(e.target.value)}
-                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="">Todos os status</option>
                     <option value="pendente">Pendentes</option>
@@ -371,7 +371,7 @@ const Dividas = () => {
                     title="Filtrar por categoria"
                     value={categoriaFiltro}
                     onChange={(e) => setCategoriaFiltro(e.target.value)}
-                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="">Todas as categorias</option>
                     {categorias.map((categoria) => (
@@ -497,7 +497,7 @@ const Dividas = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleVisualizarParcelas(divida.id)}
-                              className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
+                              className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50 dark:hover:bg-green-950"
                               title="Visualizar Parcelas"
                             >
                               <CreditCard className="w-4 h-4" />
@@ -507,7 +507,7 @@ const Dividas = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -561,7 +561,7 @@ const Dividas = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-gray-900">
+                          <h3 className="font-medium text-foreground">
                             {divida.descricao}
                           </h3>
                           <p className="text-sm text-gray-500">
@@ -616,12 +616,12 @@ const Dividas = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+                      <div className="flex items-center justify-end space-x-2 pt-2 border-t border-border">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleVisualizarParcelas(divida.id)}
-                          className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
+                          className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50 dark:hover:bg-green-950"
                           title="Visualizar Parcelas"
                         >
                           <CreditCard className="w-4 h-4" />
@@ -631,7 +631,7 @@ const Dividas = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -725,7 +725,7 @@ const Dividas = () => {
                       title="Selecionar categoria"
                       value={novaCategoria}
                       onChange={(e) => setNovaCategoria(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="">Selecione uma categoria</option>
                       {categoriasDespesa.map((categoria) => (

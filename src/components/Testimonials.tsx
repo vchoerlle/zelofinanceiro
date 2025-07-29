@@ -31,7 +31,7 @@ export const Testimonials = () => {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">O QUE DIZEM NOSSOS USUÁRIOS</h2>
+                      <h2 className="text-4xl font-bold text-foreground mb-4">O QUE DIZEM NOSSOS USUÁRIOS</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Milhares de pessoas já transformaram suas finanças com o Zelo Financeiro
           </p>
@@ -39,7 +39,7 @@ export const Testimonials = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -54,7 +54,7 @@ export const Testimonials = () => {
                     className="w-12 h-12 rounded-full mr-4"
                   />
                   <div>
-                    <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
+                    <h4 className="font-bold text-foreground">{testimonial.name}</h4>
                     <p className="text-gray-500 text-sm">{testimonial.role}</p>
                   </div>
                 </div>

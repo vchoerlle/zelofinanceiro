@@ -227,7 +227,7 @@ export default function Veiculos() {
                             variant="outline"
                             onClick={() => realizarManutencao(manutencao)}
                             disabled={manutencao.realizada}
-                            className="text-green-600 border-green-300 hover:bg-green-50 w-full sm:w-auto"
+                            className="text-green-600 border-green-300 hover:bg-green-50 dark:hover:bg-green-950 w-full sm:w-auto"
                           >
                             {manutencao.realizada ? "Realizada" : "Realizar"}
                           </Button>

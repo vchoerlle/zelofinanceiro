@@ -673,7 +673,7 @@ Responda APENAS com o JSON, sem explicações adicionais.`;
               ) : (
                 <div className="space-y-3">
                   {analysisResults.map((result) => (
-                    <div key={result.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100">
+                    <div key={result.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
                       <div className="flex items-center space-x-3">
                         <FileText className="w-4 h-4 text-gray-500" />
                         <span className="text-sm font-medium">{result.file_name}</span>

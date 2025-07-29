@@ -26,10 +26,10 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section id="como-funciona" className="py-20 bg-white">
+    <section id="como-funciona" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">COMO FUNCIONA</h2>
+                      <h2 className="text-4xl font-bold text-foreground mb-4">COMO FUNCIONA</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Simples de usar, poderoso nos resultados
           </p>
@@ -44,7 +44,7 @@ export const HowItWorks = () => {
               <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${step.color}`}>
                 <step.icon className="w-10 h-10" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h3>
+                              <h3 className="text-xl font-bold text-foreground mb-4">{step.title}</h3>
               <p className="text-gray-600 leading-relaxed">{step.description}</p>
             </div>
           ))}
@@ -56,7 +56,7 @@ export const HowItWorks = () => {
             Junte-se a milhares de usuários que já transformaram suas finanças com o Zelo Financeiro
           </p>
           <Link to="/dashboard">
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-4">
+                          <Button size="lg" className="bg-background text-orange-600 hover:bg-accent text-lg px-8 py-4 border border-border">
               Começar Agora Grátis
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>

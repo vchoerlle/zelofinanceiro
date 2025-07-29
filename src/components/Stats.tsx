@@ -42,7 +42,7 @@ export const Stats = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-background rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 border border-border">
                 <stat.icon className={`w-10 h-10 ${stat.color}`} />
               </div>
               <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>

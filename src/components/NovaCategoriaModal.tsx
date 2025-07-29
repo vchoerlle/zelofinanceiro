@@ -120,7 +120,7 @@ export const NovaCategoriaModal = ({ trigger }: NovaCategoriaModalProps) => {
                 type="color"
                 value={formData.cor}
                 onChange={(e) => handleInputChange('cor', e.target.value)}
-                className="w-12 h-10 border border-gray-300 rounded-md"
+                className="w-12 h-10 border border-input bg-background text-foreground rounded-md"
               />
               <div className="flex flex-wrap gap-2">
                 {cores.map((cor) => (
@@ -128,7 +128,7 @@ export const NovaCategoriaModal = ({ trigger }: NovaCategoriaModalProps) => {
                     key={cor}
                     type="button"
                     onClick={() => handleInputChange('cor', cor)}
-                    className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-gray-400"
+                    className="w-6 h-6 rounded-full border-2 border-input bg-background text-foreground hover:border-gray-400"
                     style={{ backgroundColor: cor }}
                   />
                 ))}

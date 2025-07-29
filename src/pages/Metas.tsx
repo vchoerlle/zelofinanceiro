@@ -376,7 +376,7 @@ const Metas = () => {
                   title="Filtrar por status"
                   value={filtroStatus}
                   onChange={(e) => setFiltroStatus(e.target.value)}
-                  className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="todas">Todos os Status</option>
                   <option value="ativa">Ativas</option>
@@ -389,7 +389,7 @@ const Metas = () => {
                   title="Filtrar por tipo"
                   value={filtroTipo}
                   onChange={(e) => setFiltroTipo(e.target.value)}
-                  className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="todos">Todos os Tipos</option>
                   <option value="economia">Economia</option>
@@ -515,7 +515,7 @@ const Metas = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => abrirModalEdicao(meta)}
-                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -524,7 +524,7 @@ const Metas = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -600,7 +600,7 @@ const Metas = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
                           <div className="space-y-1">
                             <Badge
                               className={`${getStatusColor(
@@ -619,7 +619,7 @@ const Metas = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => abrirModalEdicao(meta)}
-                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -628,7 +628,7 @@ const Metas = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -893,7 +893,7 @@ const Metas = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                     >
                                       <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -962,7 +962,7 @@ const Metas = () => {
                             {categoria.descricao || "Sem descrição"}
                           </p>
 
-                          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+                          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-border">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -976,7 +976,7 @@ const Metas = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>

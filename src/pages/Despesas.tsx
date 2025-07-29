@@ -315,7 +315,7 @@ const Despesas = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Despesas
             </h1>
             <p className="text-sm md:text-base text-gray-600">
@@ -394,7 +394,7 @@ const Despesas = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Total Geral
                 </p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   R${" "}
                   {totalDespesasFiltradas.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
@@ -419,7 +419,7 @@ const Despesas = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Despesas Pagas
                 </p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   R${" "}
                   {totalDespesasPagas.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
@@ -444,7 +444,7 @@ const Despesas = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Despesas a Pagar
                 </p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   R${" "}
                   {totalDespesasPendentes.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
@@ -469,7 +469,7 @@ const Despesas = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Despesas em Atraso
                 </p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   R${" "}
                   {totalDespesasAtraso.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
@@ -492,7 +492,7 @@ const Despesas = () => {
               </div>
               <div>
                 <p className="text-xs md:text-sm text-gray-600">Categorias</p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   {categoriasDespesa.length}
                 </p>
               </div>
@@ -518,7 +518,7 @@ const Despesas = () => {
           <TabsContent value="lista" className="space-y-4 md:space-y-6">
             {/* Filtros */}
             <Card className="p-4 md:p-6">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">
+              <h2 className="text-base md:text-lg font-bold text-foreground mb-4">
                 Filtros
               </h2>
               <div className="flex flex-col space-y-4">
@@ -537,7 +537,7 @@ const Despesas = () => {
                     title="Filtrar por categoria"
                     value={categoriaFiltro}
                     onChange={(e) => setCategoriaFiltro(e.target.value)}
-                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="">Todas as categorias</option>
                     {categorias.map((categoria) => (
@@ -551,7 +551,7 @@ const Despesas = () => {
                     title="Filtrar por status"
                     value={statusFiltro}
                     onChange={(e) => setStatusFiltro(e.target.value)}
-                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="">Todos os status</option>
                     <option value="pendente">Pendente</option>
@@ -575,8 +575,8 @@ const Despesas = () => {
 
             {/* Indicador de resultados */}
             {(filtro || categoriaFiltro || statusFiltro) && (
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
                   <strong>{despesasOrdenadas.length}</strong> despesa{despesasOrdenadas.length !== 1 ? 's' : ''} encontrada{despesasOrdenadas.length !== 1 ? 's' : ''} com os filtros aplicados
                 </p>
               </div>
@@ -674,7 +674,7 @@ const Despesas = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditarDespesa(despesa)}
-                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -683,7 +683,7 @@ const Despesas = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -736,7 +736,7 @@ const Despesas = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-gray-900">
+                          <h3 className="font-medium text-foreground">
                             {despesa.descricao}
                           </h3>
                           <div className="flex items-center space-x-2">
@@ -783,12 +783,12 @@ const Despesas = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+                      <div className="flex items-center justify-end space-x-2 pt-2 border-t border-border">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditarDespesa(despesa)}
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -797,7 +797,7 @@ const Despesas = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -879,7 +879,7 @@ const Despesas = () => {
                           categoria: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="">Selecione uma categoria</option>
                       {categoriasDespesa.map((categoria) => (

@@ -53,10 +53,10 @@ export const Pricing = () => {
   ];
 
   return (
-    <section id="precos" className="py-20 bg-white">
+    <section id="precos" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">PLANOS E PREÇOS</h2>
+                      <h2 className="text-4xl font-bold text-foreground mb-4">PLANOS E PREÇOS</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Escolha o plano ideal para suas necessidades
           </p>
@@ -76,8 +76,8 @@ export const Pricing = () => {
                 </div>
               )}
               <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
+                <CardTitle className="text-2xl font-bold text-foreground mb-2">{plan.name}</CardTitle>
+                <div className="text-4xl font-bold text-foreground mb-2">
                   {plan.price}<span className="text-lg text-gray-500 font-normal">{plan.period}</span>
                 </div>
                 <p className="text-gray-600">{plan.description}</p>
@@ -93,7 +93,7 @@ export const Pricing = () => {
                 </ul>
                 <Link to="/dashboard">
                   <Button 
-                    className={`w-full ${plan.popular ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-900 hover:bg-gray-800'} text-white`}
+                    className={`w-full ${plan.popular ? 'bg-orange-500 hover:bg-orange-600' : 'bg-primary hover:bg-primary/90'} text-primary-foreground`}
                     size="lg"
                   >
                     {plan.name === "Gratuito" ? "Começar Grátis" : "Assinar Agora"}

@@ -263,7 +263,7 @@ const Categorias = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Categorias
             </h1>
             <p className="text-sm md:text-base text-gray-600">
@@ -300,7 +300,7 @@ const Categorias = () => {
                 <p className="text-xs md:text-sm text-gray-600">
                   Total de Categorias
                 </p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   {categorias.length}
                 </p>
               </div>
@@ -354,7 +354,7 @@ const Categorias = () => {
           <TabsContent value="lista" className="space-y-4 md:space-y-6">
             {/* Filtros */}
             <Card className="p-4 md:p-6">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">
+              <h2 className="text-base md:text-lg font-bold text-foreground mb-4">
                 Filtros
               </h2>
               <div className="flex flex-col space-y-4">
@@ -373,7 +373,7 @@ const Categorias = () => {
                     title="Filtrar por tipo"
                     value={tipoFiltro}
                     onChange={(e) => setTipoFiltro(e.target.value)}
-                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="">Todos os tipos</option>
                     <option value="receita">Receitas</option>
@@ -461,7 +461,7 @@ const Categorias = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                               onClick={() => abrirModalEditar(categoria)}
                             >
                               <Edit className="w-4 h-4" />
@@ -471,7 +471,7 @@ const Categorias = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -531,7 +531,7 @@ const Categorias = () => {
                           />
                           {renderIcon(categoria.icone)}
                           <div>
-                            <h3 className="font-medium text-gray-900">
+                            <h3 className="font-medium text-foreground">
                               {categoria.nome}
                             </h3>
                             <p className="text-sm text-gray-500">
@@ -550,7 +550,7 @@ const Categorias = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Ativa
                         </span>
@@ -558,7 +558,7 @@ const Categorias = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950"
                             onClick={() => abrirModalEditar(categoria)}
                           >
                             <Edit className="w-4 h-4" />
@@ -568,7 +568,7 @@ const Categorias = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -635,7 +635,7 @@ const Categorias = () => {
                       onChange={(e) =>
                         setNovoTipo(e.target.value as "receita" | "despesa")
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="receita">Receita</option>
                       <option value="despesa">Despesa</option>
@@ -658,7 +658,7 @@ const Categorias = () => {
                       id="icone"
                       value={novoIcone}
                       onChange={(e) => setNovoIcone(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="DollarSign">💰 DollarSign</option>
                       <option value="CreditCard">💳 CreditCard</option>
@@ -695,7 +695,7 @@ const Categorias = () => {
                         title="Selecionar cor personalizada"
                         value={novaCor}
                         onChange={(e) => setNovaCor(e.target.value)}
-                        className="w-12 h-10 border border-gray-300 rounded-md"
+                        className="w-12 h-10 border border-input bg-background text-foreground rounded-md"
                       />
                       <div className="flex flex-wrap gap-2">
                         {cores.map((cor) => (
@@ -704,7 +704,7 @@ const Categorias = () => {
                             type="button"
                             title={`Selecionar cor ${cor}`}
                             onClick={() => setNovaCor(cor)}
-                            className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-gray-400"
+                            className="w-6 h-6 rounded-full border-2 border-input bg-background text-foreground hover:border-gray-400"
                             style={{ backgroundColor: cor }}
                           />
                         ))}

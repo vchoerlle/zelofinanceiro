@@ -1,6 +1,6 @@
 import { MessageCircle, Mail, Phone } from "lucide-react";
 export const Footer = () => {
-  return <footer className="bg-gray-900 text-white py-12">
+  return <footer className="bg-background text-foreground border-t border-border py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -10,7 +10,7 @@ export const Footer = () => {
               </div>
               <span className="text-2xl font-bold">Zelo Financeiro</span>
             </div>
-            <p className="text-gray-400 leading-relaxed">A plataforma completa para gerenciar suas finanças pessoais com inteligência.</p>
+                          <p className="text-muted-foreground leading-relaxed">A plataforma completa para gerenciar suas finanças pessoais com inteligência.</p>
           </div>
 
           <div>
@@ -52,7 +52,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                  <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
           <p>&copy; 2025 Zelo Financeiro. Todos os direitos reservados.</p>
         </div>
       </div>

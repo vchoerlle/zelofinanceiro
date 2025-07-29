@@ -81,7 +81,7 @@ export const DetalhesVeiculoModal = ({
                   variant="outline"
                   size="sm"
                   onClick={handleExcluir}
-                  className="text-red-600 border-red-300 hover:bg-red-50"
+                  className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-950"
                 >
                   <Trash2 className="w-4 h-4 mr-1" />
                   Excluir
@@ -140,7 +140,7 @@ export const DetalhesVeiculoModal = ({
                         size="sm"
                         variant="outline"
                         onClick={() => setQuilometragemModalOpen(true)}
-                        className="text-green-600 border-green-300 hover:bg-green-50"
+                        className="text-green-600 border-green-300 hover:bg-green-50 dark:hover:bg-green-950"
                       >
                         Atualizar Quilometragem
                       </Button>
@@ -175,7 +175,7 @@ export const DetalhesVeiculoModal = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-green-600 border-green-300 hover:bg-green-50"
+                            className="text-green-600 border-green-300 hover:bg-green-50 dark:hover:bg-green-950"
                           >
                             Realizar
                           </Button>

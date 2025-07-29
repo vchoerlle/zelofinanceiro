@@ -90,7 +90,7 @@ export const EditarCategoriaModal = ({ categoria, open, onOpenChange, onSave }: 
               id="tipo"
               value={formData.tipo}
               onChange={(e) => handleInputChange("tipo", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md"
             >
               <option value="receita">Receita</option>
               <option value="despesa">Despesa</option>
@@ -112,7 +112,7 @@ export const EditarCategoriaModal = ({ categoria, open, onOpenChange, onSave }: 
                 type="color"
                 value={formData.cor}
                 onChange={(e) => handleInputChange("cor", e.target.value)}
-                className="w-12 h-10 border border-gray-300 rounded-md"
+                className="w-12 h-10 border border-input bg-background text-foreground rounded-md"
               />
               <div className="flex flex-wrap gap-2">
                 {cores.map((cor) => (
@@ -120,7 +120,7 @@ export const EditarCategoriaModal = ({ categoria, open, onOpenChange, onSave }: 
                     key={cor}
                     type="button"
                     onClick={() => handleInputChange("cor", cor)}
-                    className={`w-6 h-6 rounded-full border-2 ${formData.cor === cor ? "border-black" : "border-gray-300"}`}
+                    className={`w-6 h-6 rounded-full border-2 ${formData.cor === cor ? "border-black" : "border-input bg-background text-foreground"}`}
                     style={{ backgroundColor: cor }}
                   />
                 ))}
@@ -133,7 +133,7 @@ export const EditarCategoriaModal = ({ categoria, open, onOpenChange, onSave }: 
               id="icone"
               value={formData.icone}
               onChange={(e) => handleInputChange("icone", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md"
             >
               <option value="DollarSign">💰 DollarSign</option>
               <option value="CreditCard">💳 CreditCard</option>

@@ -224,7 +224,7 @@ const Perfil = () => {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="w-full justify-start h-12 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                 onClick={() => setShowDeleteAccountModal(true)}
               >
                 <Trash2 className="w-4 h-4 mr-3" />

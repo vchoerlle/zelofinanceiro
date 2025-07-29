@@ -84,7 +84,7 @@ const Transacoes = () => {
       <div className="p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Transações
             </h1>
             <p className="text-sm md:text-base text-gray-600">
@@ -168,7 +168,7 @@ const Transacoes = () => {
               </div>
               <div>
                 <p className="text-xs md:text-sm text-gray-600">Transações</p>
-                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   {transacoes.length}
                 </p>
               </div>
@@ -177,7 +177,7 @@ const Transacoes = () => {
         </div>
 
         <Card className="p-4 md:p-6 mb-6">
-          <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">
+          <h2 className="text-base md:text-lg font-bold text-foreground mb-4">
             Filtros
           </h2>
           <div className="flex flex-col space-y-4">
@@ -196,7 +196,7 @@ const Transacoes = () => {
                 title="Filtrar por tipo"
                 value={tipoFiltro}
                 onChange={(e) => setTipoFiltro(e.target.value)}
-                className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="">Todos os tipos</option>
                 <option value="receita">Receitas</option>
@@ -207,7 +207,7 @@ const Transacoes = () => {
                 title="Filtrar por categoria"
                 value={categoriaFiltro}
                 onChange={(e) => setCategoriaFiltro(e.target.value)}
-                className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full sm:w-48 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="">Todas as categorias</option>
                 {categorias.map((categoria) => (
@@ -337,7 +337,7 @@ const Transacoes = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="font-medium text-foreground">
                         {transacao.descricao}
                       </h3>
                       <div className="flex items-center space-x-2">
