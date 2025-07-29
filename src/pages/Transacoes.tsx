@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useTransacoes } from "@/hooks/useTransacoes";
+import { SortableTableHead } from "@/components/SortableTableHead";
+import { useTableSort } from "@/hooks/useTableSort";
 import { renderIcon } from "@/lib/icon-utils";
 
 interface Transacao {
@@ -51,12 +53,13 @@ const Transacoes = () => {
         categoriaFiltro === "" ||
         transacao.categorias?.nome === categoriaFiltro;
       return matchDescricao && matchTipo && matchCategoria;
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.data + "T00:00:00").getTime() -
-        new Date(a.data + "T00:00:00").getTime()
-    );
+    });
+
+  // Hook para ordenação da tabela
+  const { sortedData: transacoesOrdenadas, requestSort, getSortDirection } = useTableSort(
+    transacoesFiltradas,
+    { key: 'data', direction: 'desc' } // Ordenação padrão por data decrescente
+  );
 
   const totalReceitas = transacoes
     .filter((t) => t.tipo === "receita")
@@ -231,15 +234,46 @@ const Transacoes = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-right">Valor</TableHead>
+                  <SortableTableHead
+                    sortKey="descricao"
+                    currentSortDirection={getSortDirection('descricao')}
+                    onSort={requestSort}
+                  >
+                    Descrição
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="categorias.nome"
+                    currentSortDirection={getSortDirection('categorias.nome')}
+                    onSort={requestSort}
+                  >
+                    Categoria
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="tipo"
+                    currentSortDirection={getSortDirection('tipo')}
+                    onSort={requestSort}
+                  >
+                    Tipo
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="data"
+                    currentSortDirection={getSortDirection('data')}
+                    onSort={requestSort}
+                  >
+                    Data
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="valor"
+                    currentSortDirection={getSortDirection('valor')}
+                    onSort={requestSort}
+                    className="text-right"
+                  >
+                    Valor
+                  </SortableTableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transacoesFiltradas.map((transacao) => (
+                {transacoesOrdenadas.map((transacao) => (
                   <TableRow key={transacao.id}>
                     <TableCell className="font-medium">
                       {transacao.descricao}

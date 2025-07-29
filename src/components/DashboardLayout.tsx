@@ -38,7 +38,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: TrendingUp, label: "Receitas", path: "/receitas" },
     { icon: TrendingDown, label: "Despesas", path: "/despesas" },
     { icon: FileText, label: "Transações", path: "/transacoes" },
-    { icon: PieChart, label: "Dívidas", path: "/dividas" },
+    { icon: PieChart, label: "Parcelamentos", path: "/dividas" },
     { icon: Tag, label: "Categorias", path: "/categorias" },
     { icon: BarChart3, label: "Relatórios", path: "/relatorios" },
     { icon: Target, label: "Metas", path: "/metas" },

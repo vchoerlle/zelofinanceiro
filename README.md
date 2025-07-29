@@ -25,7 +25,7 @@ O **Guarda Conta** é uma aplicação web moderna para controle financeiro pesso
 - **Dashboard Interativo** - Visão geral das finanças em tempo real
 - **Receitas & Despesas** - Controle completo de entradas e saídas
 - **Categorização Inteligente** - Organize suas transações por categorias personalizáveis
-- **Gestão de Dívidas** - Acompanhe e controle seus compromissos financeiros
+- **Gestão de Parcelamentos** - Acompanhe e controle seus compromissos financeiros
 - **Metas Financeiras** - Defina e monitore objetivos financeiros
 
 ### 📊 **Relatórios e Análises**

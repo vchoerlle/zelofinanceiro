@@ -96,7 +96,7 @@ export const EditarDividaModal = ({ isOpen, onClose, divida, onSave }: EditarDiv
 
     toast({
       title: "Sucesso",
-      description: "Dívida editada com sucesso!",
+      description: "Parcelamento editado com sucesso!",
     });
   };
 
@@ -108,10 +108,10 @@ export const EditarDividaModal = ({ isOpen, onClose, divida, onSave }: EditarDiv
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Editar Dívida</DialogTitle>
-          <DialogDescription>
-            Edite as informações da dívida abaixo.
-          </DialogDescription>
+          <DialogTitle>Editar Parcelamento</DialogTitle>
+                      <DialogDescription>
+              Edite as informações do parcelamento abaixo.
+            </DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">

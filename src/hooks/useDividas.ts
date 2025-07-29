@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useParcelasDividas } from "./useParcelasDividas";
 
 export interface Divida {
   id: string;
@@ -29,6 +30,7 @@ export const useDividas = () => {
   const [dividas, setDividas] = useState<Divida[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { createParcelasForDivida, deleteParcelasByDivida } = useParcelasDividas();
 
   const fetchDividas = async () => {
     try {
@@ -44,7 +46,7 @@ export const useDividas = () => {
       setDividas((data || []) as Divida[]);
     } catch (error: any) {
       toast({
-        title: "Erro ao carregar dívidas",
+        title: "Erro ao carregar parcelamentos",
         description: error.message,
         variant: "destructive",
       });
@@ -70,15 +72,28 @@ export const useDividas = () => {
       if (error) throw error;
       setDividas(prev => [data as Divida, ...prev]);
       
+      // Criar parcelas automaticamente
+      if (data && divida.parcelas > 0 && divida.categoria_id) {
+        await createParcelasForDivida(
+          data.id,
+          divida.descricao,
+          divida.credor,
+          divida.valor_total,
+          divida.parcelas,
+          divida.data_vencimento,
+          divida.categoria_id
+        );
+      }
+      
       toast({
-        title: "Dívida criada",
-        description: "Dívida criada com sucesso!",
+        title: "Parcelamento criado",
+        description: `Parcelamento criado com sucesso! ${divida.parcelas > 0 ? `${divida.parcelas} parcelas foram geradas automaticamente.` : ''}`,
       });
       
       return { data, error: null };
     } catch (error: any) {
       toast({
-        title: "Erro ao criar dívida",
+        title: "Erro ao criar parcelamento",
         description: error.message,
         variant: "destructive",
       });
@@ -102,14 +117,14 @@ export const useDividas = () => {
       setDividas(prev => prev.map(divida => divida.id === id ? data as Divida : divida));
       
       toast({
-        title: "Dívida atualizada",
-        description: "Dívida atualizada com sucesso!",
+        title: "Parcelamento atualizado",
+        description: "Parcelamento atualizado com sucesso!",
       });
       
       return { data, error: null };
     } catch (error: any) {
       toast({
-        title: "Erro ao atualizar dívida",
+        title: "Erro ao atualizar parcelamento",
         description: error.message,
         variant: "destructive",
       });
@@ -117,8 +132,68 @@ export const useDividas = () => {
     }
   };
 
+  const recalculateDividaValues = async (dividaId: string) => {
+    try {
+      // Buscar todas as parcelas do parcelamento com o status da despesa
+      const { data: parcelas, error: parcelasError } = await supabase
+        .from('parcelas_dividas')
+        .select(`
+          id,
+          valor_parcela,
+          status,
+          despesas (status)
+        `)
+        .eq('divida_id', dividaId);
+
+      if (parcelasError) throw parcelasError;
+
+      // Calcular valores baseado no status das despesas (que é o status real das parcelas)
+      const parcelasPagas = parcelas.filter(p => p.despesas?.status === 'pago').length;
+      const valorPago = parcelas.filter(p => p.despesas?.status === 'pago').reduce((total, p) => total + p.valor_parcela, 0);
+      const valorTotal = parcelas.reduce((total, p) => total + p.valor_parcela, 0);
+      const valorRestante = valorTotal - valorPago;
+
+      // Determinar status do parcelamento baseado no status das despesas
+      let status = 'pendente';
+      if (parcelasPagas === parcelas.length) {
+        status = 'quitada';
+      } else if (parcelas.some(p => p.despesas?.status === 'atraso')) {
+        status = 'vencida';
+      }
+
+      // Atualizar o parcelamento com os novos valores
+      const { data, error } = await supabase
+        .from('dividas')
+        .update({
+          valor_pago: valorPago,
+          valor_restante: valorRestante,
+          parcelas_pagas: parcelasPagas,
+          status: status
+        })
+        .eq('id', dividaId)
+        .select(`
+          *,
+          categorias (nome, cor, icone)
+        `)
+        .single();
+
+      if (error) throw error;
+      
+      setDividas(prev => prev.map(divida => divida.id === dividaId ? data as Divida : divida));
+      
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Erro ao recalcular valores do parcelamento:', error);
+      return { data: null, error };
+    }
+  };
+
   const deleteDivida = async (id: string) => {
     try {
+      // Primeiro deletar as parcelas relacionadas
+      await deleteParcelasByDivida(id);
+      
+      // Depois deletar o parcelamento
       const { error } = await supabase
         .from('dividas')
         .delete()
@@ -128,14 +203,14 @@ export const useDividas = () => {
       setDividas(prev => prev.filter(divida => divida.id !== id));
       
       toast({
-        title: "Dívida removida",
-        description: "Dívida removida com sucesso!",
+        title: "Parcelamento removido",
+        description: "Parcelamento e todas as suas parcelas foram removidos com sucesso!",
       });
       
       return { error: null };
     } catch (error: any) {
       toast({
-        title: "Erro ao remover dívida",
+        title: "Erro ao remover parcelamento",
         description: error.message,
         variant: "destructive",
       });
@@ -153,6 +228,7 @@ export const useDividas = () => {
     createDivida,
     updateDivida,
     deleteDivida,
+    recalculateDividaValues,
     refetch: fetchDividas
   };
 };

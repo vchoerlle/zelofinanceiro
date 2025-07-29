@@ -38,6 +38,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useReceitas } from "@/hooks/useReceitas";
 import { EditarReceitaModal } from "@/components/EditarReceitaModal";
+import { SortableTableHead } from "@/components/SortableTableHead";
+import { useTableSort } from "@/hooks/useTableSort";
 import { renderIcon } from "@/lib/icon-utils";
 
 interface Receita {
@@ -66,6 +68,32 @@ const Receitas = () => {
 
   const [filtro, setFiltro] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
+  // Função para formatar data no formato brasileiro (dd/mm/yyyy)
+  const formatarDataBR = (dataString: string) => {
+    if (!dataString) return "";
+    const [ano, mes, dia] = dataString.split("-");
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  // Função para obter o primeiro dia do mês atual no formato YYYY-MM-DD
+  const getPrimeiroDiaMes = () => {
+    const now = new Date();
+    const ano = now.getFullYear();
+    const mes = String(now.getMonth() + 1).padStart(2, "0");
+    return `${ano}-${mes}-01`;
+  };
+
+  // Função para obter o último dia do mês atual no formato YYYY-MM-DD
+  const getUltimoDiaMes = () => {
+    const now = new Date();
+    const ano = now.getFullYear();
+    const mes = now.getMonth() + 1;
+    const ultimoDia = new Date(ano, mes, 0).getDate();
+    return `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+  };
+
+  const [dataInicial, setDataInicial] = useState(getPrimeiroDiaMes());
+  const [dataFinal, setDataFinal] = useState(getUltimoDiaMes());
 
   // Estados para o modal de edição
   const [receitaEditando, setReceitaEditando] = useState<Receita | null>(null);
@@ -140,6 +168,28 @@ const Receitas = () => {
     await deleteReceita(id);
   };
 
+  // Função para aplicar filtro de data
+  const aplicarFiltroData = (receita: any) => {
+    if (!dataInicial && !dataFinal) {
+      return true; // Se não há filtro de data, retorna todas
+    }
+
+    const dataReceita = receita.data.split('T')[0]; // Pega apenas a data (YYYY-MM-DD)
+
+    if (dataInicial && dataFinal) {
+      // Filtro com data inicial e final
+      return dataReceita >= dataInicial && dataReceita <= dataFinal;
+    } else if (dataInicial) {
+      // Apenas data inicial
+      return dataReceita >= dataInicial;
+    } else if (dataFinal) {
+      // Apenas data final
+      return dataReceita <= dataFinal;
+    }
+
+    return true;
+  };
+
   const receitasFiltradas = receitas
     .filter((receita) => {
       const matchDescricao = receita.descricao
@@ -147,11 +197,17 @@ const Receitas = () => {
         .includes(filtro.toLowerCase());
       const matchCategoria =
         categoriaFiltro === "" || receita.categorias?.nome === categoriaFiltro;
-      return matchDescricao && matchCategoria;
-    })
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+      const matchData = aplicarFiltroData(receita);
+      return matchDescricao && matchCategoria && matchData;
+    });
 
-  const totalReceitas = receitas.reduce(
+  // Hook para ordenação da tabela
+  const { sortedData: receitasOrdenadas, requestSort, getSortDirection } = useTableSort(
+    receitasFiltradas,
+    { key: 'data', direction: 'desc' } // Ordenação padrão por data decrescente
+  );
+
+  const totalReceitas = receitasFiltradas.reduce(
     (total, receita) => total + receita.valor,
     0
   );
@@ -160,6 +216,42 @@ const Receitas = () => {
   const limparFiltros = () => {
     setFiltro("");
     setCategoriaFiltro("");
+    setDataInicial("");
+    setDataFinal("");
+  };
+
+  const validarDatas = () => {
+    if (dataInicial && dataFinal && dataInicial > dataFinal) {
+      toast({
+        title: "Erro",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleDataInicialChange = (value: string) => {
+    setDataInicial(value);
+    if (value && dataFinal && value > dataFinal) {
+      toast({
+        title: "Aviso",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDataFinalChange = (value: string) => {
+    setDataFinal(value);
+    if (value && dataInicial && dataInicial > value) {
+      toast({
+        title: "Aviso",
+        description: "A data final não pode ser menor que a data inicial",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -184,6 +276,58 @@ const Receitas = () => {
           </Button>
         </div>
 
+        {/* Filtro de Período - Topo da Tela */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">Período:</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="date"
+                value={dataInicial}
+                onChange={(e) => handleDataInicialChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data inicial"
+                max={dataFinal || undefined}
+              />
+              <span className="text-sm text-gray-500">até</span>
+              <Input
+                type="date"
+                value={dataFinal}
+                onChange={(e) => handleDataFinalChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data final"
+                min={dataInicial || undefined}
+              />
+            </div>
+            {(dataInicial || dataFinal) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={limparFiltros}
+                className="h-8 text-xs"
+              >
+                Limpar
+              </Button>
+            )}
+          </div>
+          {(dataInicial || dataFinal) && (
+            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              {dataInicial && dataFinal && (
+                <span>{formatarDataBR(dataInicial)} - {formatarDataBR(dataFinal)}</span>
+              )}
+              {dataInicial && !dataFinal && (
+                <span>A partir de {formatarDataBR(dataInicial)}</span>
+              )}
+              {!dataInicial && dataFinal && (
+                <span>Até {formatarDataBR(dataFinal)}</span>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-4 md:p-6">
@@ -201,6 +345,12 @@ const Receitas = () => {
                     minimumFractionDigits: 2,
                   })}
                 </p>
+                <p className="text-xs text-gray-500">
+                  {receitasFiltradas.length} receita{receitasFiltradas.length !== 1 ? 's' : ''}
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
+                </p>
               </div>
             </div>
           </Card>
@@ -213,7 +363,12 @@ const Receitas = () => {
               <div>
                 <p className="text-xs md:text-sm text-gray-600">Receitas</p>
                 <p className="text-lg md:text-2xl font-bold text-gray-900">
-                  {receitas.length}
+                  {receitasFiltradas.length}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -298,16 +453,41 @@ const Receitas = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Categoria</TableHead>
+                      <SortableTableHead
+                        sortKey="descricao"
+                        currentSortDirection={getSortDirection('descricao')}
+                        onSort={requestSort}
+                      >
+                        Descrição
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="categorias.nome"
+                        currentSortDirection={getSortDirection('categorias.nome')}
+                        onSort={requestSort}
+                      >
+                        Categoria
+                      </SortableTableHead>
                       <TableHead>Tipo</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
+                      <SortableTableHead
+                        sortKey="data"
+                        currentSortDirection={getSortDirection('data')}
+                        onSort={requestSort}
+                      >
+                        Data
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="valor"
+                        currentSortDirection={getSortDirection('valor')}
+                        onSort={requestSort}
+                        className="text-right"
+                      >
+                        Valor
+                      </SortableTableHead>
                       <TableHead className="text-center">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {receitasFiltradas.map((receita) => (
+                    {receitasOrdenadas.map((receita) => (
                       <TableRow key={receita.id}>
                         <TableCell className="font-medium">
                           {receita.descricao}

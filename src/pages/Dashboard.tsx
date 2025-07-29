@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTransacoes } from "@/hooks/useTransacoes";
+import { useDespesas } from "@/hooks/useDespesas";
 import { useItensMercado } from "@/hooks/useItensMercado";
 import { useDividas } from "@/hooks/useDividas";
 import { useVeiculos } from "@/hooks/useVeiculos";
@@ -58,10 +59,36 @@ const getPrimeiroDiaMes = () => {
   )}-01`;
 };
 
+// Função para obter o último dia do mês no formato do banco (YYYY-MM-DD)
+const getUltimoDiaMes = () => {
+  const now = new Date();
+  const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return `${ultimoDia.getFullYear()}-${String(ultimoDia.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(ultimoDia.getDate()).padStart(2, "0")}`;
+};
+
 // Função para obter o primeiro dia do ano no formato do banco (YYYY-MM-DD)
 const getPrimeiroDiaAno = () => {
   const now = new Date();
   return `${now.getFullYear()}-01-01`;
+};
+
+// Função para obter o último dia do ano no formato do banco (YYYY-MM-DD)
+const getUltimoDiaAno = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-12-31`;
+};
+
+// Função para obter o último dia da semana no formato do banco (YYYY-MM-DD)
+const getUltimoDiaSemana = () => {
+  const now = new Date();
+  const ultimoDiaSemana = new Date(now);
+  ultimoDiaSemana.setDate(now.getDate() + (6 - now.getDay()));
+  return `${ultimoDiaSemana.getFullYear()}-${String(
+    ultimoDiaSemana.getMonth() + 1
+  ).padStart(2, "0")}-${String(ultimoDiaSemana.getDate()).padStart(2, "0")}`;
 };
 
 // Função para comparar datas no formato do banco (YYYY-MM-DD)
@@ -90,10 +117,11 @@ const formatarMes = (data: Date) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedPeriod, setSelectedPeriod] = useState("mês");
+  const [selectedPeriod, setSelectedPeriod] = useState("mes");
 
   // Usar dados reais dos hooks
   const { transacoes, loading: loadingTransacoes } = useTransacoes();
+  const { despesas, loading: loadingDespesas } = useDespesas();
   const { itensMercado, loading: loadingItens } = useItensMercado();
   const { dividas, loading: loadingDividas } = useDividas();
   const { veiculos, loading: loadingVeiculos } = useVeiculos();
@@ -105,9 +133,10 @@ const Dashboard = () => {
 
   // Processar dados com useMemo para performance
   const processedData = useMemo(() => {
-    if (loadingTransacoes || !transacoes.length) {
+    if (loadingTransacoes || !transacoes.length || loadingDespesas || !despesas.length) {
       return {
         transacoesFiltradas: [],
+        despesasFiltradas: [],
         totalReceitas: 0,
         totalDespesas: 0,
         saldoPeriodo: 0,
@@ -118,6 +147,7 @@ const Dashboard = () => {
 
     const hoje = getDataAtual();
 
+    // Filtrar transações (receitas) por período
     const transacoesFiltradas = transacoes.filter((transacao) => {
       const dataTransacao = transacao.data.split("T")[0];
 
@@ -125,11 +155,29 @@ const Dashboard = () => {
         case "dia":
           return dataTransacao === hoje;
         case "semana":
-          return dataTransacao >= getPrimeiroDiaSemana();
+          return dataTransacao >= getPrimeiroDiaSemana() && dataTransacao <= getUltimoDiaSemana();
         case "mes":
-          return dataTransacao >= getPrimeiroDiaMes();
+          return dataTransacao >= getPrimeiroDiaMes() && dataTransacao <= getUltimoDiaMes();
         case "ano":
-          return dataTransacao >= getPrimeiroDiaAno();
+          return dataTransacao >= getPrimeiroDiaAno() && dataTransacao <= getUltimoDiaAno();
+        default:
+          return true;
+      }
+    });
+
+    // Filtrar despesas por período (usando data de vencimento)
+    const despesasFiltradas = despesas.filter((despesa) => {
+      const dataVencimento = despesa.data.split("T")[0];
+
+      switch (selectedPeriod) {
+        case "dia":
+          return dataVencimento === hoje;
+        case "semana":
+          return dataVencimento >= getPrimeiroDiaSemana() && dataVencimento <= getUltimoDiaSemana();
+        case "mes":
+          return dataVencimento >= getPrimeiroDiaMes() && dataVencimento <= getUltimoDiaMes();
+        case "ano":
+          return dataVencimento >= getPrimeiroDiaAno() && dataVencimento <= getUltimoDiaAno();
         default:
           return true;
       }
@@ -139,9 +187,9 @@ const Dashboard = () => {
       .filter((t) => t.tipo === "receita")
       .reduce((total, transacao) => total + Number(transacao.valor), 0);
 
-    const totalDespesas = transacoesFiltradas
-      .filter((t) => t.tipo === "despesa")
-      .reduce((total, transacao) => total + Number(transacao.valor), 0);
+    // Usar despesas da tabela despesas (data de vencimento)
+    const totalDespesas = despesasFiltradas
+      .reduce((total, despesa) => total + Number(despesa.valor), 0);
 
     // Calcula o período anterior
     const getPeriodoAnterior = () => {
@@ -185,6 +233,9 @@ const Dashboard = () => {
       transacoesFiltradas: transacoesFiltradas.sort((a, b) =>
         b.data.localeCompare(a.data)
       ),
+      despesasFiltradas: despesasFiltradas.sort((a, b) =>
+        b.data.localeCompare(a.data)
+      ),
       totalReceitas,
       totalDespesas,
       saldoPeriodo,
@@ -192,10 +243,11 @@ const Dashboard = () => {
       percentualDespesas,
       totalReceitasAnterior,
     };
-  }, [transacoes, selectedPeriod, loadingTransacoes]);
+  }, [transacoes, despesas, selectedPeriod, loadingTransacoes, loadingDespesas]);
 
   const {
     transacoesFiltradas,
+    despesasFiltradas,
     totalReceitas,
     totalDespesas,
     saldoPeriodo,
@@ -244,7 +296,7 @@ const Dashboard = () => {
     (item) => item.status === "estoque_baixo" || item.status === "sem_estoque"
   );
 
-  // Dívidas vencidas (usar nomes corretos das propriedades)
+          // Parcelamentos vencidos (usar nomes corretos das propriedades)
   const dividasVencidas = dividas.filter(
     (divida) => divida.status === "vencida"
   );
@@ -380,7 +432,7 @@ const Dashboard = () => {
                 <TabsTrigger value="semana" className="text-sm">
                   Semana
                 </TabsTrigger>
-                <TabsTrigger value="mês" className="text-sm">
+                <TabsTrigger value="mes" className="text-sm">
                   Mês
                 </TabsTrigger>
                 <TabsTrigger value="ano" className="text-sm">
@@ -586,7 +638,7 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Dívidas Vencidas Card */}
+          {/* Parcelamentos Vencidos Card */}
           <Card className="p-4 md:p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -595,7 +647,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <h3 className="text-base md:text-lg font-bold text-gray-900">
-                    Dívidas Vencidas
+                    Parcelamentos Vencidos
                   </h3>
                   <p className="text-xs md:text-sm text-gray-600">
                     R${" "}

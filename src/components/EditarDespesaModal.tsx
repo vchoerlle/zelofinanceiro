@@ -126,7 +126,7 @@ export const EditarDespesaModal = ({ despesa, isOpen, onClose, onSave }: EditarD
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="data">Data *</Label>
+            <Label htmlFor="data">Data Vcto *</Label>
             <Input
               id="data"
               type="date"

@@ -51,6 +51,8 @@ import { useCategorias } from "@/hooks/useCategorias";
 import { renderIcon } from "@/lib/icon-utils";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { EditarCategoriaModal } from "@/components/EditarCategoriaModal";
+import { SortableTableHead } from "@/components/SortableTableHead";
+import { useTableSort } from "@/hooks/useTableSort";
 
 interface Categoria {
   id: string;
@@ -102,6 +104,12 @@ const Categorias = () => {
     const matchTipo = tipoFiltro === "" || categoria.tipo === tipoFiltro;
     return matchNome && matchTipo;
   });
+
+  // Hook para ordenação da tabela
+  const { sortedData: categoriasOrdenadas, requestSort, getSortDirection } = useTableSort(
+    categoriasFiltradas,
+    { key: 'nome', direction: 'asc' } // Ordenação padrão por nome crescente
+  );
 
   const categoriasReceita = categorias.filter((c) => c.tipo === "receita");
   const categoriasDespesa = categorias.filter((c) => c.tipo === "despesa");
@@ -389,15 +397,33 @@ const Categorias = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Descrição</TableHead>
+                      <SortableTableHead
+                        sortKey="nome"
+                        currentSortDirection={getSortDirection('nome')}
+                        onSort={requestSort}
+                      >
+                        Categoria
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="tipo"
+                        currentSortDirection={getSortDirection('tipo')}
+                        onSort={requestSort}
+                      >
+                        Tipo
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="descricao"
+                        currentSortDirection={getSortDirection('descricao')}
+                        onSort={requestSort}
+                      >
+                        Descrição
+                      </SortableTableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {categoriasFiltradas.map((categoria) => (
+                    {categoriasOrdenadas.map((categoria) => (
                       <TableRow key={categoria.id}>
                         <TableCell className="font-medium">
                           <div className="flex items-center space-x-3">

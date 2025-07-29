@@ -9,6 +9,7 @@ export interface Despesa {
   descricao: string;
   valor: number;
   data: string;
+  status: 'pago' | 'pendente' | 'atraso';
   created_at: string;
   updated_at: string;
   categorias?: {
@@ -57,7 +58,7 @@ export const useDespesas = () => {
         new Date(b.data).getTime() - new Date(a.data).getTime()
       );
 
-      setDespesas(sortedDespesas);
+      setDespesas(sortedDespesas as Despesa[]);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar despesas",
@@ -84,7 +85,7 @@ export const useDespesas = () => {
         .single();
 
       if (error) throw error;
-      setDespesas(prev => [data, ...prev]);
+      setDespesas(prev => [data as Despesa, ...prev]);
       
       toast({
         title: "Despesa criada",
@@ -115,7 +116,7 @@ export const useDespesas = () => {
         .single();
 
       if (error) throw error;
-      setDespesas(prev => prev.map(despesa => despesa.id === id ? data : despesa));
+      setDespesas(prev => prev.map(despesa => despesa.id === id ? data as Despesa : despesa));
       
       toast({
         title: "Despesa atualizada",
@@ -159,6 +160,78 @@ export const useDespesas = () => {
     }
   };
 
+  const updateDespesaStatus = async (id: string, status: 'pago' | 'pendente' | 'atraso') => {
+    try {
+      // Mapear status da despesa para status da parcela
+      const statusParcela = status === 'pago' ? 'paga' : 
+                           status === 'atraso' ? 'vencida' : 'pendente';
+
+      // Atualizar a despesa
+      const { data, error } = await supabase
+        .from('despesas')
+        .update({ status })
+        .eq('id', id)
+        .select(`
+          *,
+          categorias (nome, cor, icone)
+        `)
+        .single();
+
+      if (error) throw error;
+
+      // Atualizar também o status da parcela correspondente (se existir)
+      const { error: parcelaError } = await supabase
+        .from('parcelas_dividas')
+        .update({ status: statusParcela })
+        .eq('despesa_id', id);
+
+      if (parcelaError) {
+        console.warn('Erro ao atualizar status da parcela:', parcelaError);
+        // Não falhar se não conseguir atualizar a parcela
+      }
+
+      // Buscar a dívida relacionada para recalcular os valores
+      const { data: parcelaData, error: parcelaDataError } = await supabase
+        .from('parcelas_dividas')
+        .select('divida_id')
+        .eq('despesa_id', id)
+        .single();
+
+      if (!parcelaDataError && parcelaData) {
+        // Armazenar no localStorage para sincronização entre páginas
+        const dividasParaRecalcular = JSON.parse(localStorage.getItem('dividasParaRecalcular') || '[]');
+        if (!dividasParaRecalcular.includes(parcelaData.divida_id)) {
+          dividasParaRecalcular.push(parcelaData.divida_id);
+          localStorage.setItem('dividasParaRecalcular', JSON.stringify(dividasParaRecalcular));
+        }
+        
+        // Disparar um evento customizado para notificar que a dívida precisa ser recalculada
+        window.dispatchEvent(new CustomEvent('dividaRecalcular', { 
+          detail: { dividaId: parcelaData.divida_id } 
+        }));
+        
+        // Disparar evento para notificar mudança de status da parcela
+        window.dispatchEvent(new CustomEvent('parcelaStatusChanged'));
+      }
+
+      setDespesas(prev => prev.map(despesa => despesa.id === id ? data as Despesa : despesa));
+      
+      toast({
+        title: "Status atualizado",
+        description: `Status da despesa alterado para ${status}!`,
+      });
+      
+      return { data, error: null };
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar status",
+        description: error.message,
+        variant: "destructive",
+      });
+      return { data: null, error };
+    }
+  };
+
   useEffect(() => {
     fetchDespesas();
   }, []);
@@ -169,6 +242,7 @@ export const useDespesas = () => {
     createDespesa,
     updateDespesa,
     deleteDespesa,
+    updateDespesaStatus,
     refetch: fetchDespesas
   };
 };

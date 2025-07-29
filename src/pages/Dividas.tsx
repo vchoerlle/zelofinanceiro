@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -38,23 +38,53 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDividas } from "@/hooks/useDividas";
-import { EditarDividaModal } from "@/components/EditarDividaModal";
+import { VisualizarParcelasModal } from "@/components/VisualizarParcelasModal";
+import { SortableTableHead } from "@/components/SortableTableHead";
+import { useTableSort } from "@/hooks/useTableSort";
 import { renderIcon } from "@/lib/icon-utils";
 import type { Divida } from "@/hooks/useDividas";
 
 const Dividas = () => {
   const { toast } = useToast();
   const { categoriasDespesa } = useCategorias();
-  const { dividas, createDivida, updateDivida, deleteDivida } = useDividas();
+  const { dividas, createDivida, updateDivida, deleteDivida, recalculateDividaValues } = useDividas();
   const [activeTab, setActiveTab] = useState("lista");
-  const [dividaEditando, setDividaEditando] = useState<Divida | null>(null);
-  const [modalEditarAberto, setModalEditarAberto] = useState(false);
+  const [modalParcelasAberto, setModalParcelasAberto] = useState(false);
+  const [dividaSelecionada, setDividaSelecionada] = useState<Divida | null>(null);
+  const [dividaExcluindo, setDividaExcluindo] = useState<Divida | null>(null);
+  const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
+
+  // Verificar localStorage e escutar eventos de recálculo de parcelamentos
+  useEffect(() => {
+    // Verificar se há dividas para recalcular no localStorage
+    const dividasParaRecalcular = JSON.parse(localStorage.getItem('dividasParaRecalcular') || '[]');
+    
+    if (dividasParaRecalcular.length > 0) {
+      dividasParaRecalcular.forEach((dividaId: string) => {
+        recalculateDividaValues(dividaId);
+      });
+      
+      // Limpar localStorage após recalcular
+      localStorage.removeItem('dividasParaRecalcular');
+    }
+    
+    const handleDividaRecalcular = (event: CustomEvent) => {
+      const { dividaId } = event.detail;
+      recalculateDividaValues(dividaId);
+    };
+
+    window.addEventListener('dividaRecalcular', handleDividaRecalcular as EventListener);
+
+    return () => {
+      window.removeEventListener('dividaRecalcular', handleDividaRecalcular as EventListener);
+    };
+  }, [recalculateDividaValues]);
 
   const [filtro, setFiltro] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
 
-  // Formulário para nova dívida
+          // Formulário para novo parcelamento
   const [novaDescricao, setNovaDescricao] = useState("");
   const [novoValorTotal, setNovoValorTotal] = useState("");
   const [novaDataVencimento, setNovaDataVencimento] = useState("");
@@ -71,12 +101,13 @@ const Dividas = () => {
       const matchCategoria =
         categoriaFiltro === "" || divida.categorias?.nome === categoriaFiltro;
       return matchDescricao && matchStatus && matchCategoria;
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.data_vencimento + "T00:00:00").getTime() -
-        new Date(a.data_vencimento + "T00:00:00").getTime()
-    );
+    });
+
+  // Hook para ordenação da tabela
+  const { sortedData: dividasOrdenadas, requestSort, getSortDirection } = useTableSort(
+    dividasFiltradas,
+    { key: 'data_vencimento', direction: 'desc' } // Ordenação padrão por data de vencimento decrescente
+  );
 
   const totalDividas = dividas.reduce(
     (total, divida) => total + divida.valor_restante,
@@ -152,38 +183,32 @@ const Dividas = () => {
     setActiveTab("lista");
   };
 
-  const handleExcluirDivida = async (id: string) => {
-    await deleteDivida(id);
+  const handleExcluirDivida = (divida: Divida) => {
+    setDividaExcluindo(divida);
+    setModalExcluirAberto(true);
   };
 
-  const handleEditarDivida = (id: string) => {
-    const divida = dividas.find((d) => d.id === id);
-    if (divida) {
-      setDividaEditando(divida);
-      setModalEditarAberto(true);
+  const confirmarExclusaoDivida = async () => {
+    if (dividaExcluindo) {
+      await deleteDivida(dividaExcluindo.id);
+      setModalExcluirAberto(false);
+      setDividaExcluindo(null);
     }
   };
 
-  const handleSalvarEdicao = async (dividaEditada: Divida) => {
-    // ✅ Corrigir: buscar categoria pelo nome correto
-    const categoria = categoriasDespesa.find(
-      (c) => c.nome === dividaEditada.categoria
-    );
 
-    await updateDivida(dividaEditada.id, {
-      descricao: dividaEditada.descricao,
-      valor_total: dividaEditada.valor_total,
-      valor_pago: dividaEditada.valor_pago,
-      data_vencimento: dividaEditada.data_vencimento,
-      parcelas: dividaEditada.parcelas,
-      parcelas_pagas: dividaEditada.parcelas_pagas,
-      status: dividaEditada.status,
-      categoria_id: categoria?.id,
-      credor: dividaEditada.credor,
-    });
 
-    setDividaEditando(null);
+  const handleVisualizarParcelas = (id: string) => {
+    const divida = dividas.find((d) => d.id === id);
+    if (divida) {
+      setDividaSelecionada(divida);
+      setModalParcelasAberto(true);
+    }
   };
+
+
+
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -218,10 +243,10 @@ const Dividas = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Dívidas
+              Parcelamentos
             </h1>
             <p className="text-sm md:text-base text-gray-600">
-              Controle e gerenciamento de dívidas
+              Controle e gerenciamento de parcelamentos
             </p>
           </div>
           <Button
@@ -229,7 +254,7 @@ const Dividas = () => {
             className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Nova Dívida
+            Novo Parcelamento
           </Button>
         </div>
 
@@ -305,10 +330,10 @@ const Dividas = () => {
         >
           <TabsList className="w-full grid grid-cols-2 sm:w-auto sm:inline-flex">
             <TabsTrigger value="lista" className="text-sm">
-              Lista de Dívidas
+              Lista de Parcelamentos
             </TabsTrigger>
             <TabsTrigger value="adicionar" className="text-sm">
-              Adicionar Dívida
+              Adicionar Parcelamento
             </TabsTrigger>
           </TabsList>
 
@@ -322,7 +347,7 @@ const Dividas = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="Buscar dívidas..."
+                    placeholder="Buscar parcelamentos..."
                     value={filtro}
                     onChange={(e) => setFiltro(e.target.value)}
                     className="pl-10"
@@ -367,26 +392,67 @@ const Dividas = () => {
               </div>
             </Card>
 
-            {/* Tabela de Dívidas - Visível apenas em desktop */}
+            {/* Tabela de Parcelamentos - Visível apenas em desktop */}
             <div className="hidden md:block">
               <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Credor</TableHead>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Parcelas</TableHead>
-                      <TableHead>Vencimento</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">
+                      <SortableTableHead
+                        sortKey="descricao"
+                        currentSortDirection={getSortDirection('descricao')}
+                        onSort={requestSort}
+                      >
+                        Descrição
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="credor"
+                        currentSortDirection={getSortDirection('credor')}
+                        onSort={requestSort}
+                      >
+                        Credor
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="categorias.nome"
+                        currentSortDirection={getSortDirection('categorias.nome')}
+                        onSort={requestSort}
+                      >
+                        Categoria
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="parcelas"
+                        currentSortDirection={getSortDirection('parcelas')}
+                        onSort={requestSort}
+                      >
+                        Parcelas
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="data_vencimento"
+                        currentSortDirection={getSortDirection('data_vencimento')}
+                        onSort={requestSort}
+                      >
+                        Vencimento
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="status"
+                        currentSortDirection={getSortDirection('status')}
+                        onSort={requestSort}
+                      >
+                        Status
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="valor_restante"
+                        currentSortDirection={getSortDirection('valor_restante')}
+                        onSort={requestSort}
+                        className="text-right"
+                      >
                         Valor Restante
-                      </TableHead>
+                      </SortableTableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dividasFiltradas.map((divida) => (
+                    {dividasOrdenadas.map((divida) => (
                       <TableRow key={divida.id}>
                         <TableCell className="font-medium">
                           {divida.descricao}
@@ -430,10 +496,11 @@ const Dividas = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleEditarDivida(divida.id)}
-                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                              onClick={() => handleVisualizarParcelas(divida.id)}
+                              className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
+                              title="Visualizar Parcelas"
                             >
-                              <Edit className="w-4 h-4" />
+                              <CreditCard className="w-4 h-4" />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
@@ -448,10 +515,10 @@ const Dividas = () => {
                               <AlertDialogContent className="sm:max-w-[425px]">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
-                                    Excluir Dívida
+                                    Excluir Parcelamento
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Tem certeza que deseja excluir a dívida "
+                                    Tem certeza que deseja excluir o parcelamento "
                                     {divida.descricao}"? Esta ação não pode ser
                                     desfeita.
                                   </AlertDialogDescription>
@@ -462,7 +529,7 @@ const Dividas = () => {
                                   </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() =>
-                                      handleExcluirDivida(divida.id)
+                                      handleExcluirDivida(divida)
                                     }
                                     className="bg-red-600 hover:bg-red-700"
                                   >
@@ -485,7 +552,7 @@ const Dividas = () => {
               {dividasFiltradas.length === 0 ? (
                 <Card className="p-4">
                   <p className="text-center text-gray-500">
-                    Nenhuma dívida encontrada.
+                    Nenhum parcelamento encontrado.
                   </p>
                 </Card>
               ) : (
@@ -553,10 +620,11 @@ const Dividas = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEditarDivida(divida.id)}
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          onClick={() => handleVisualizarParcelas(divida.id)}
+                          className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-50"
+                          title="Visualizar Parcelas"
                         >
-                          <Edit className="w-4 h-4" />
+                          <CreditCard className="w-4 h-4" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
@@ -571,10 +639,10 @@ const Dividas = () => {
                           <AlertDialogContent className="sm:max-w-[425px]">
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Excluir Dívida
+                                Excluir Parcelamento
                               </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Tem certeza que deseja excluir a dívida "
+                                Tem certeza que deseja excluir o parcelamento "
                                 {divida.descricao}"? Esta ação não pode ser
                                 desfeita.
                               </AlertDialogDescription>
@@ -582,7 +650,7 @@ const Dividas = () => {
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancelar</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() => handleExcluirDivida(divida.id)}
+                                onClick={() => handleExcluirDivida(divida)}
                                 className="bg-red-600 hover:bg-red-700"
                               >
                                 Excluir
@@ -603,7 +671,7 @@ const Dividas = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">
-                    Adicionar Nova Dívida
+                    Adicionar Novo Parcelamento
                   </h3>
                 </div>
 
@@ -684,7 +752,7 @@ const Dividas = () => {
                     onClick={handleAdicionarDivida}
                     className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto"
                   >
-                    Adicionar Dívida
+                    Adicionar Parcelamento
                   </Button>
                   <Button
                     variant="outline"
@@ -699,16 +767,50 @@ const Dividas = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Modal de Edição */}
-        <EditarDividaModal
-          isOpen={modalEditarAberto}
+
+
+        {/* Modal de Visualizar Parcelas */}
+        <VisualizarParcelasModal
+          isOpen={modalParcelasAberto}
           onClose={() => {
-            setModalEditarAberto(false);
-            setDividaEditando(null);
+            setModalParcelasAberto(false);
+            setDividaSelecionada(null);
           }}
-          divida={dividaEditando}
-          onSave={handleSalvarEdicao}
+          dividaId={dividaSelecionada?.id || ''}
+          dividaDescricao={dividaSelecionada?.descricao || ''}
         />
+
+        {/* Modal de Confirmação de Exclusão de Parcelamento */}
+        <AlertDialog open={modalExcluirAberto} onOpenChange={setModalExcluirAberto}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Exclusão do Parcelamento</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja excluir o parcelamento <strong>"{dividaExcluindo?.descricao}"</strong>?
+                <br />
+                <br />
+                <strong>Esta ação não pode ser desfeita.</strong>
+                <br />
+                <br />
+                <strong>Informações importantes:</strong>
+                <br />
+                • Todas as parcelas relacionadas serão removidas
+                <br />
+                • As despesas associadas serão excluídas
+                <br />
+                • O histórico de pagamentos será perdido
+                <br />
+                • Esta ação é irreversível
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmarExclusaoDivida} className="bg-red-600 hover:bg-red-700">
+                Excluir Parcelamento
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardLayout>
   );

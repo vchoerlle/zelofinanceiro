@@ -33,11 +33,15 @@ import {
   DollarSign,
   Edit,
   Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useDespesas } from "@/hooks/useDespesas";
 import { EditarDespesaModal } from "@/components/EditarDespesaModal";
+import { StatusDespesaButton } from "@/components/StatusDespesaButton";
+import { SortableTableHead } from "@/components/SortableTableHead";
+import { useTableSort } from "@/hooks/useTableSort";
 import { renderIcon } from "@/lib/icon-utils";
 
 interface Despesa {
@@ -52,7 +56,7 @@ interface Despesa {
 const Despesas = () => {
   const { toast } = useToast();
   const { categoriasDespesa } = useCategorias();
-  const { despesas, createDespesa, updateDespesa, deleteDespesa } =
+  const { despesas, createDespesa, updateDespesa, deleteDespesa, updateDespesaStatus } =
     useDespesas();
   const [activeTab, setActiveTab] = useState("lista");
 
@@ -64,8 +68,35 @@ const Despesas = () => {
     tipo: "variavel" as "fixa" | "variavel",
   });
 
+  // Função para formatar data no formato brasileiro (dd/mm/yyyy)
+  const formatarDataBR = (dataString: string) => {
+    if (!dataString) return "";
+    const [ano, mes, dia] = dataString.split("-");
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  // Função para obter o primeiro dia do mês atual no formato YYYY-MM-DD
+  const getPrimeiroDiaMes = () => {
+    const now = new Date();
+    const ano = now.getFullYear();
+    const mes = String(now.getMonth() + 1).padStart(2, "0");
+    return `${ano}-${mes}-01`;
+  };
+
+  // Função para obter o último dia do mês atual no formato YYYY-MM-DD
+  const getUltimoDiaMes = () => {
+    const now = new Date();
+    const ano = now.getFullYear();
+    const mes = now.getMonth() + 1;
+    const ultimoDia = new Date(ano, mes, 0).getDate();
+    return `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+  };
+
   const [filtro, setFiltro] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState("");
+  const [dataInicial, setDataInicial] = useState(getPrimeiroDiaMes());
+  const [dataFinal, setDataFinal] = useState(getUltimoDiaMes());
 
   // Estados para o modal de edição
   const [despesaEditando, setDespesaEditando] = useState<Despesa | null>(null);
@@ -97,6 +128,7 @@ const Despesas = () => {
       valor: parseFloat(novaDespesa.valor),
       categoria_id: categoria?.id,
       data: novaDespesa.data,
+      status: 'pendente',
     });
 
     setNovaDespesa({
@@ -140,6 +172,10 @@ const Despesas = () => {
     await deleteDespesa(id);
   };
 
+  const handleStatusChange = async (id: string, status: 'pago' | 'pendente' | 'atraso') => {
+    await updateDespesaStatus(id, status);
+  };
+
   const despesasFiltradas = despesas
     .filter((despesa) => {
       const matchDescricao = despesa.descricao
@@ -147,19 +183,130 @@ const Despesas = () => {
         .includes(filtro.toLowerCase());
       const matchCategoria =
         categoriaFiltro === "" || despesa.categorias?.nome === categoriaFiltro;
-      return matchDescricao && matchCategoria;
-    })
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+      const matchStatus =
+        statusFiltro === "" || despesa.status === statusFiltro;
+      
+      // Filtro por data de vencimento
+      let matchData = true;
+      if (dataInicial || dataFinal) {
+        const dataVencimento = despesa.data;
+        
+        if (dataInicial && dataFinal) {
+          // Filtro com data inicial e final
+          matchData = dataVencimento >= dataInicial && dataVencimento <= dataFinal;
+        } else if (dataInicial) {
+          // Apenas data inicial
+          matchData = dataVencimento >= dataInicial;
+        } else if (dataFinal) {
+          // Apenas data final
+          matchData = dataVencimento <= dataFinal;
+        }
+      }
+      
+      return matchDescricao && matchCategoria && matchStatus && matchData;
+    });
 
-  const totalDespesas = despesas.reduce(
+  // Hook para ordenação da tabela
+  const { sortedData: despesasOrdenadas, requestSort, getSortDirection } = useTableSort(
+    despesasFiltradas,
+    { key: 'data', direction: 'desc' } // Ordenação padrão por data decrescente
+  );
+
+  // Função para aplicar filtro de data
+  const aplicarFiltroData = (despesa: any) => {
+    if (!dataInicial && !dataFinal) {
+      return true; // Se não há filtro de data, retorna todas
+    }
+    
+    const dataVencimento = despesa.data;
+    
+    if (dataInicial && dataFinal) {
+      // Filtro com data inicial e final
+      return dataVencimento >= dataInicial && dataVencimento <= dataFinal;
+    } else if (dataInicial) {
+      // Apenas data inicial
+      return dataVencimento >= dataInicial;
+    } else if (dataFinal) {
+      // Apenas data final
+      return dataVencimento <= dataFinal;
+    }
+    
+    return true;
+  };
+
+  // Cálculos para os cards baseados no status e filtro de data
+  const despesasPagas = despesas.filter(despesa => 
+    despesa.status === 'pago' && aplicarFiltroData(despesa)
+  );
+  const despesasPendentes = despesas.filter(despesa => 
+    despesa.status === 'pendente' && aplicarFiltroData(despesa)
+  );
+  const despesasAtraso = despesas.filter(despesa => 
+    despesa.status === 'atraso' && aplicarFiltroData(despesa)
+  );
+
+  const totalDespesasPagas = despesasPagas.reduce(
     (total, despesa) => total + despesa.valor,
     0
   );
+  const totalDespesasPendentes = despesasPendentes.reduce(
+    (total, despesa) => total + despesa.valor,
+    0
+  );
+  const totalDespesasAtraso = despesasAtraso.reduce(
+    (total, despesa) => total + despesa.valor,
+    0
+  );
+
+  // Total geral das despesas filtradas
+  const totalDespesasFiltradas = totalDespesasPagas + totalDespesasPendentes + totalDespesasAtraso;
+  const totalDespesasFiltradasCount = despesasPagas.length + despesasPendentes.length + despesasAtraso.length;
+
   const categorias = categoriasDespesa.map((c) => c.nome);
 
   const limparFiltros = () => {
     setFiltro("");
     setCategoriaFiltro("");
+    setStatusFiltro("");
+    setDataInicial("");
+    setDataFinal("");
+  };
+
+  // Função para validar datas
+  const validarDatas = () => {
+    if (dataInicial && dataFinal && dataInicial > dataFinal) {
+      toast({
+        title: "Erro",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  // Função para lidar com mudança de data inicial
+  const handleDataInicialChange = (value: string) => {
+    setDataInicial(value);
+    if (value && dataFinal && value > dataFinal) {
+      toast({
+        title: "Aviso",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para lidar com mudança de data final
+  const handleDataFinalChange = (value: string) => {
+    setDataFinal(value);
+    if (value && dataInicial && dataInicial > value) {
+      toast({
+        title: "Aviso",
+        description: "A data final não pode ser menor que a data inicial",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -184,22 +331,80 @@ const Despesas = () => {
           </Button>
         </div>
 
+        {/* Filtro de Período - Topo da Tela */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">Período:</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="date"
+                value={dataInicial}
+                onChange={(e) => handleDataInicialChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data inicial"
+                max={dataFinal || undefined}
+              />
+              <span className="text-sm text-gray-500">até</span>
+              <Input
+                type="date"
+                value={dataFinal}
+                onChange={(e) => handleDataFinalChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data final"
+                min={dataInicial || undefined}
+              />
+            </div>
+            {(dataInicial || dataFinal) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={limparFiltros}
+                className="h-8 text-xs"
+              >
+                Limpar
+              </Button>
+            )}
+          </div>
+          {(dataInicial || dataFinal) && (
+            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              {dataInicial && dataFinal && (
+                <span>{formatarDataBR(dataInicial)} - {formatarDataBR(dataFinal)}</span>
+              )}
+              {dataInicial && !dataFinal && (
+                <span>A partir de {formatarDataBR(dataInicial)}</span>
+              )}
+              {!dataInicial && dataFinal && (
+                <span>Até {formatarDataBR(dataFinal)}</span>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-4 md:p-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-red-100 rounded-full p-2 md:p-3">
-                <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
+              <div className="bg-blue-100 rounded-full p-2 md:p-3">
+                <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-xs md:text-sm text-gray-600">
-                  Total de Despesas
+                  Total Geral
                 </p>
                 <p className="text-lg md:text-2xl font-bold text-gray-900">
                   R${" "}
-                  {totalDespesas.toLocaleString("pt-BR", {
+                  {totalDespesasFiltradas.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
                   })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {totalDespesasFiltradasCount} despesa{totalDespesasFiltradasCount !== 1 ? 's' : ''}
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -207,13 +412,74 @@ const Despesas = () => {
 
           <Card className="p-4 md:p-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-blue-100 rounded-full p-2 md:p-3">
-                <TrendingDown className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+              <div className="bg-green-100 rounded-full p-2 md:p-3">
+                <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-gray-600">Despesas</p>
+                <p className="text-xs md:text-sm text-gray-600">
+                  Despesas Pagas
+                </p>
                 <p className="text-lg md:text-2xl font-bold text-gray-900">
-                  {despesas.length}
+                  R${" "}
+                  {totalDespesasPagas.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {despesasPagas.length} despesa{despesasPagas.length !== 1 ? 's' : ''}
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 md:p-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-yellow-100 rounded-full p-2 md:p-3">
+                <TrendingDown className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-xs md:text-sm text-gray-600">
+                  Despesas a Pagar
+                </p>
+                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                  R${" "}
+                  {totalDespesasPendentes.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {despesasPendentes.length} despesa{despesasPendentes.length !== 1 ? 's' : ''}
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 md:p-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-red-100 rounded-full p-2 md:p-3">
+                <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
+              </div>
+              <div>
+                <p className="text-xs md:text-sm text-gray-600">
+                  Despesas em Atraso
+                </p>
+                <p className="text-lg md:text-2xl font-bold text-gray-900">
+                  R${" "}
+                  {totalDespesasAtraso.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {despesasAtraso.length} despesa{despesasAtraso.length !== 1 ? 's' : ''}
+                  {(dataInicial || dataFinal) && (
+                    <span className="text-blue-600 font-medium"> • Filtrado</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -280,6 +546,21 @@ const Despesas = () => {
                       </option>
                     ))}
                   </select>
+                  <select
+                    id="status-filtro"
+                    title="Filtrar por status"
+                    value={statusFiltro}
+                    onChange={(e) => setStatusFiltro(e.target.value)}
+                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="">Todos os status</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="pago">Pago</option>
+                    <option value="atraso">Atraso</option>
+                  </select>
+                </div>
+                
+                <div className="flex justify-end">
                   <Button
                     variant="outline"
                     onClick={limparFiltros}
@@ -292,22 +573,64 @@ const Despesas = () => {
               </div>
             </Card>
 
+            {/* Indicador de resultados */}
+            {(filtro || categoriaFiltro || statusFiltro) && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>{despesasOrdenadas.length}</strong> despesa{despesasOrdenadas.length !== 1 ? 's' : ''} encontrada{despesasOrdenadas.length !== 1 ? 's' : ''} com os filtros aplicados
+                </p>
+              </div>
+            )}
+
             {/* Tabela de Despesas - Visível apenas em desktop */}
             <div className="hidden md:block">
               <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Categoria</TableHead>
+                      <SortableTableHead
+                        sortKey="descricao"
+                        currentSortDirection={getSortDirection('descricao')}
+                        onSort={requestSort}
+                      >
+                        Descrição
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="categorias.nome"
+                        currentSortDirection={getSortDirection('categorias.nome')}
+                        onSort={requestSort}
+                      >
+                        Categoria
+                      </SortableTableHead>
                       <TableHead>Tipo</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
+                      <SortableTableHead
+                        sortKey="data"
+                        currentSortDirection={getSortDirection('data')}
+                        onSort={requestSort}
+                      >
+                        Data Vcto
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="valor"
+                        currentSortDirection={getSortDirection('valor')}
+                        onSort={requestSort}
+                        className="text-right"
+                      >
+                        Valor
+                      </SortableTableHead>
+                      <SortableTableHead
+                        sortKey="status"
+                        currentSortDirection={getSortDirection('status')}
+                        onSort={requestSort}
+                        className="text-center"
+                      >
+                        Status
+                      </SortableTableHead>
                       <TableHead className="text-center">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {despesasFiltradas.map((despesa) => (
+                    {despesasOrdenadas.map((despesa) => (
                       <TableRow key={despesa.id}>
                         <TableCell className="font-medium">
                           {despesa.descricao}
@@ -337,6 +660,13 @@ const Despesas = () => {
                           {despesa.valor.toLocaleString("pt-BR", {
                             minimumFractionDigits: 2,
                           })}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <StatusDespesaButton
+                            status={despesa.status}
+                            onStatusChange={(status) => handleStatusChange(despesa.id, status)}
+                            size="sm"
+                          />
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center space-x-2">
@@ -425,9 +755,9 @@ const Despesas = () => {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-3 gap-2 text-sm">
                         <div>
-                          <p className="text-gray-500">Data</p>
+                          <p className="text-gray-500">Data Vcto</p>
                           <p className="font-medium">
                             {new Date(
                               despesa.data + "T00:00:00"
@@ -442,6 +772,14 @@ const Despesas = () => {
                               minimumFractionDigits: 2,
                             })}
                           </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Status</p>
+                          <StatusDespesaButton
+                            status={despesa.status}
+                            onStatusChange={(status) => handleStatusChange(despesa.id, status)}
+                            size="sm"
+                          />
                         </div>
                       </div>
 
@@ -553,7 +891,7 @@ const Despesas = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="data">Data *</Label>
+                    <Label htmlFor="data">Data Vcto *</Label>
                     <Input
                       id="data"
                       type="date"

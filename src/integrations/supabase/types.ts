@@ -115,6 +115,7 @@ export type Database = {
           data: string;
           descricao: string;
           id: string;
+          status: string;
           updated_at: string;
           user_id: string;
           valor: number;
@@ -125,6 +126,7 @@ export type Database = {
           data?: string;
           descricao: string;
           id?: string;
+          status?: string;
           updated_at?: string;
           user_id: string;
           valor: number;
@@ -135,6 +137,7 @@ export type Database = {
           data?: string;
           descricao?: string;
           id?: string;
+          status?: string;
           updated_at?: string;
           user_id?: string;
           valor?: number;
@@ -204,6 +207,57 @@ export type Database = {
             columns: ["categoria_id"];
             isOneToOne: false;
             referencedRelation: "categorias";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      parcelas_dividas: {
+        Row: {
+          id: string;
+          divida_id: string;
+          despesa_id: string;
+          numero_parcela: number;
+          data_vencimento: string;
+          valor_parcela: number;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          divida_id: string;
+          despesa_id: string;
+          numero_parcela: number;
+          data_vencimento: string;
+          valor_parcela: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          divida_id?: string;
+          despesa_id?: string;
+          numero_parcela?: number;
+          data_vencimento?: string;
+          valor_parcela?: number;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "parcelas_dividas_divida_id_fkey";
+            columns: ["divida_id"];
+            isOneToOne: false;
+            referencedRelation: "dividas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "parcelas_dividas_despesa_id_fkey";
+            columns: ["despesa_id"];
+            isOneToOne: false;
+            referencedRelation: "despesas";
             referencedColumns: ["id"];
           }
         ];
@@ -383,6 +437,39 @@ export type Database = {
             referencedColumns: ["id"];
           }
         ];
+      };
+      lista_compras: {
+        Row: {
+          id: string;
+          user_id: string;
+          descricao: string;
+          quantidade: number;
+          unidade_medida: string;
+          comprado: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          descricao: string;
+          quantidade?: number;
+          unidade_medida?: string;
+          comprado?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          descricao?: string;
+          quantidade?: number;
+          unidade_medida?: string;
+          comprado?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       manutencoes: {
         Row: {
