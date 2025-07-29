@@ -480,6 +480,8 @@ export type Database = {
           observacoes: string | null;
           quilometragem_proxima: number | null;
           quilometragem_realizada: number | null;
+          quilometragem_veiculo: number | null;
+          valor_manutencao: number | null;
           status: string;
           tipo_manutencao_id: string;
           updated_at: string;
@@ -494,6 +496,8 @@ export type Database = {
           observacoes?: string | null;
           quilometragem_proxima?: number | null;
           quilometragem_realizada?: number | null;
+          quilometragem_veiculo?: number | null;
+          valor_manutencao?: number | null;
           status?: string;
           tipo_manutencao_id: string;
           updated_at?: string;
@@ -508,6 +512,8 @@ export type Database = {
           observacoes?: string | null;
           quilometragem_proxima?: number | null;
           quilometragem_realizada?: number | null;
+          quilometragem_veiculo?: number | null;
+          valor_manutencao?: number | null;
           status?: string;
           tipo_manutencao_id?: string;
           updated_at?: string;
@@ -732,6 +738,51 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      veiculos_tipos_manutencao: {
+        Row: {
+          id: string;
+          veiculo_id: string;
+          tipo_manutencao_id: string;
+          ativo: boolean;
+          created_at: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          id?: string;
+          veiculo_id: string;
+          tipo_manutencao_id: string;
+          ativo?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          id?: string;
+          veiculo_id?: string;
+          tipo_manutencao_id?: string;
+          ativo?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "veiculos_tipos_manutencao_veiculo_id_fkey";
+            columns: ["veiculo_id"];
+            isOneToOne: false;
+            referencedRelation: "veiculos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "veiculos_tipos_manutencao_tipo_manutencao_id_fkey";
+            columns: ["tipo_manutencao_id"];
+            isOneToOne: false;
+            referencedRelation: "tipos_manutencao";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       transacoes: {
         Row: {

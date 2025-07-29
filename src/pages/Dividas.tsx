@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -53,6 +54,7 @@ const Dividas = () => {
   const [dividaSelecionada, setDividaSelecionada] = useState<Divida | null>(null);
   const [dividaExcluindo, setDividaExcluindo] = useState<Divida | null>(null);
   const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
+  const location = useLocation();
 
   // Verificar localStorage e escutar eventos de recálculo de parcelamentos
   useEffect(() => {
@@ -79,6 +81,23 @@ const Dividas = () => {
       window.removeEventListener('dividaRecalcular', handleDividaRecalcular as EventListener);
     };
   }, [recalculateDividaValues]);
+
+  // Verificar se veio de uma manutenção
+  useEffect(() => {
+    if (location.state?.novoParcelamento && location.state?.origem === 'manutencao') {
+      const dadosManutencao = location.state.novoParcelamento;
+      setNovaDescricao(dadosManutencao.descricao || "");
+      setNovoValorTotal(dadosManutencao.valor_total?.toString() || "");
+      setNovaDataVencimento(dadosManutencao.data_vencimento || "");
+      setNovasParcelas("1"); // Parcela única por padrão
+      setNovaCategoria("");
+      setNovoCredor(dadosManutencao.credor || "");
+      setActiveTab("adicionar");
+      
+      // Limpar o state para não preencher novamente
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const [filtro, setFiltro] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");

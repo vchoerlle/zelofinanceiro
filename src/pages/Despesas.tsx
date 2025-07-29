@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -59,6 +60,7 @@ const Despesas = () => {
   const { despesas, createDespesa, updateDespesa, deleteDespesa, updateDespesaStatus } =
     useDespesas();
   const [activeTab, setActiveTab] = useState("lista");
+  const location = useLocation();
 
   const [novaDespesa, setNovaDespesa] = useState({
     descricao: "",
@@ -67,6 +69,24 @@ const Despesas = () => {
     data: "",
     tipo: "variavel" as "fixa" | "variavel",
   });
+
+  // Verificar se veio de uma manutenção
+  useEffect(() => {
+    if (location.state?.novaDespesa && location.state?.origem === 'manutencao') {
+      const dadosManutencao = location.state.novaDespesa;
+      setNovaDespesa({
+        descricao: dadosManutencao.descricao || "",
+        valor: dadosManutencao.valor?.toString() || "",
+        categoria: "",
+        data: dadosManutencao.data || new Date().toISOString().split('T')[0],
+        tipo: "variavel"
+      });
+      setActiveTab("adicionar");
+      
+      // Limpar o state para não preencher novamente
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Função para formatar data no formato brasileiro (dd/mm/yyyy)
   const formatarDataBR = (dataString: string) => {
@@ -335,8 +355,8 @@ const Despesas = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">Período:</span>
+              <Calendar className="w-4 h-4 text-orange-500 dark:text-orange-300" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Período:</span>
             </div>
             <div className="flex items-center space-x-2">
               <Input

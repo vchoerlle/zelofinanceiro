@@ -351,8 +351,8 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">Período:</span>
+              <Calendar className="w-4 h-4 text-orange-500 dark:text-orange-300" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Período:</span>
             </div>
             <div className="flex items-center space-x-2">
               <Input

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +17,7 @@ export const useTiposManutencao = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchTiposManutencao = async () => {
+  const fetchTiposManutencao = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -46,7 +46,7 @@ export const useTiposManutencao = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   const adicionarTipo = async (novoTipo: Omit<TipoManutencao, 'id'>) => {
     try {
@@ -165,7 +165,7 @@ export const useTiposManutencao = () => {
 
   useEffect(() => {
     fetchTiposManutencao();
-  }, []);
+  }, [fetchTiposManutencao]);
 
   return {
     tiposManutencao,

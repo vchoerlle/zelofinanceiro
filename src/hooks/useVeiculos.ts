@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,7 +21,7 @@ export const useVeiculos = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchVeiculos = async () => {
+  const fetchVeiculos = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -50,7 +50,7 @@ export const useVeiculos = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   const adicionarVeiculo = async (novoVeiculo: Omit<Veiculo, 'id'>) => {
     try {
@@ -205,7 +205,7 @@ export const useVeiculos = () => {
 
   useEffect(() => {
     fetchVeiculos();
-  }, []);
+  }, [fetchVeiculos]);
 
   return {
     veiculos,
