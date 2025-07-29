@@ -183,7 +183,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
         {/* Theme Toggle and Logout */}
         <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
-          <div className={`flex ${isCollapsed ? "justify-center" : "justify-start"}`}>
+          <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-start"}`}>
             <ThemeToggle 
               className={isCollapsed ? "w-full justify-center" : ""}
             />
