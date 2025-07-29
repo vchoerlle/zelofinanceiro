@@ -86,6 +86,9 @@ export const EditarMetaModal = ({
 
   useEffect(() => {
     if (meta) {
+      // Verifica se a categoria da meta ainda existe
+      const categoriaExiste = categoriasMetas.some(cat => cat.id === meta.categoria_meta_id);
+      
       setFormData({
         titulo: meta.titulo,
         tipo: meta.tipo,
@@ -94,25 +97,66 @@ export const EditarMetaModal = ({
         data_inicio: formatDateForInput(meta.data_inicio),
         data_limite: formatDateForInput(meta.data_limite),
         status: meta.status,
-        categoria_meta_id: meta.categoria_meta_id || "",
+        categoria_meta_id: categoriaExiste ? meta.categoria_meta_id || "" : "",
         descricao: meta.descricao || "",
       });
     }
-  }, [meta]);
+  }, [meta, categoriasMetas]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !meta ||
-      !formData.titulo ||
-      !formData.valor_alvo ||
-      !formData.data_limite ||
-      !formData.categoria_meta_id
-    ) {
+    if (!meta) {
       toast({
         title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
+        description: "Meta não encontrada.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.titulo) {
+      toast({
+        title: "Erro",
+        description: "Por favor, informe o título da meta.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.valor_alvo) {
+      toast({
+        title: "Erro",
+        description: "Por favor, informe o valor alvo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.data_limite) {
+      toast({
+        title: "Erro",
+        description: "Por favor, informe a data limite.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.categoria_meta_id) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma categoria.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verifica se a categoria selecionada ainda existe
+    const categoriaExiste = categoriasMetas.some(cat => cat.id === formData.categoria_meta_id);
+    if (!categoriaExiste) {
+      toast({
+        title: "Erro",
+        description: "A categoria selecionada não existe mais. Por favor, selecione uma nova categoria.",
         variant: "destructive",
       });
       return;
@@ -195,6 +239,18 @@ export const EditarMetaModal = ({
                   ))}
                 </SelectContent>
               </Select>
+              {formData.categoria_meta_id && !categoriasAtivas.find(cat => cat.id === formData.categoria_meta_id) && (
+                <div className="space-y-2">
+                  <p className="text-sm text-red-600">
+                    Categoria não encontrada. Selecione uma nova categoria.
+                  </p>
+                  {meta?.categorias_metas && (
+                    <p className="text-sm text-gray-600">
+                      Categoria atual: <span className="font-medium">{meta.categorias_metas.nome}</span>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

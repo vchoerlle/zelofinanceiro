@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -88,6 +89,13 @@ const formatarData = (dataString: string) => {
   return `${dia}/${mes}/${ano}`;
 };
 
+// Função para formatar data em português
+const formatarDataBR = (dataString: string) => {
+  if (!dataString) return "";
+  const [ano, mes, dia] = dataString.split("-");
+  return `${dia}/${mes}/${ano}`;
+};
+
 // Função para obter a data atual no formato do banco (YYYY-MM-DD)
 const getDataAtual = () => {
   const now = new Date();
@@ -116,6 +124,16 @@ const getPrimeiroDiaMes = () => {
   )}-01`;
 };
 
+// Função para obter o último dia do mês no formato do banco (YYYY-MM-DD)
+const getUltimoDiaMes = () => {
+  const now = new Date();
+  const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return `${ultimoDia.getFullYear()}-${String(ultimoDia.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(ultimoDia.getDate()).padStart(2, "0")}`;
+};
+
 // Função para obter o primeiro dia do trimestre no formato do banco (YYYY-MM-DD)
 const getPrimeiroDiaTrimestre = () => {
   const now = new Date();
@@ -130,11 +148,77 @@ const getPrimeiroDiaAno = () => {
 };
 
 const Relatorios = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState("mes");
   const [selectedCategory, setSelectedCategory] = useState("todas");
+  const [dataInicial, setDataInicial] = useState(getPrimeiroDiaMes());
+  const [dataFinal, setDataFinal] = useState(getUltimoDiaMes());
   const { toast } = useToast();
   const { transacoes, loading: loadingTransacoes } = useTransacoes();
   const { categorias, loading: loadingCategorias } = useCategorias();
+
+  // Função para aplicar filtro de data
+  const aplicarFiltroData = (dataString: string) => {
+    if (!dataInicial && !dataFinal) {
+      return true; // Se não há filtro de data, retorna todas
+    }
+
+    const dataItem = dataString.split('T')[0]; // Pega apenas a data (YYYY-MM-DD)
+
+    if (dataInicial && dataFinal) {
+      // Filtro com data inicial e final
+      return dataItem >= dataInicial && dataItem <= dataFinal;
+    } else if (dataInicial) {
+      // Apenas data inicial
+      return dataItem >= dataInicial;
+    } else if (dataFinal) {
+      // Apenas data final
+      return dataItem <= dataFinal;
+    }
+
+    return true;
+  };
+
+  // Função para validar datas
+  const validarDatas = () => {
+    if (dataInicial && dataFinal && dataInicial > dataFinal) {
+      toast({
+        title: "Erro",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  // Função para lidar com mudança de data inicial
+  const handleDataInicialChange = (value: string) => {
+    setDataInicial(value);
+    if (value && dataFinal && value > dataFinal) {
+      toast({
+        title: "Aviso",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para lidar com mudança de data final
+  const handleDataFinalChange = (value: string) => {
+    setDataFinal(value);
+    if (value && dataInicial && dataInicial > value) {
+      toast({
+        title: "Aviso",
+        description: "A data final não pode ser menor que a data inicial",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para limpar filtros
+  const limparFiltros = () => {
+    setDataInicial(getPrimeiroDiaMes());
+    setDataFinal(getUltimoDiaMes());
+  };
 
   const processedData = useMemo(() => {
     if (loadingTransacoes || !transacoes.length) {
@@ -149,148 +233,44 @@ const Relatorios = () => {
 
     // Filtrar transações baseado no período
     const filteredByPeriod = transacoes.filter((transacao) => {
-      const dataTransacao = transacao.data.split("T")[0];
-
-      switch (selectedPeriod) {
-        case "semana":
-          return dataTransacao >= getPrimeiroDiaSemana();
-        case "mes":
-          return dataTransacao >= getPrimeiroDiaMes();
-        case "trimestre":
-          return dataTransacao >= getPrimeiroDiaTrimestre();
-        case "ano":
-          return dataTransacao >= getPrimeiroDiaAno();
-        default:
-          return true;
-      }
+      return aplicarFiltroData(transacao.data);
     });
 
-    // Calcular dados do gráfico baseado no período
+    // Calcular dados do gráfico - sempre agrupar por mês
     let chartData: ChartData[] = [];
 
-    if (selectedPeriod === "semana") {
-      // Agrupar por dia da semana
-      const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-      chartData = days.map((day) => {
-        const dayIndex = days.indexOf(day);
-        const dayTransactions = filteredByPeriod.filter((t) => {
-          const [ano, mes, dia] = t.data.split("T")[0].split("-");
-          const data = new Date(Number(ano), Number(mes) - 1, Number(dia));
-          return data.getDay() === dayIndex;
-        });
+    // Agrupar por mês
+    const meses = [
+      "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+      "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    ];
 
-        const receitas = dayTransactions
-          .filter((t) => t.tipo === "receita")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-        const despesas = dayTransactions
-          .filter((t) => t.tipo === "despesa")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
+    // Pegar os últimos 12 meses
+    for (let i = 11; i >= 0; i--) {
+      const data = new Date();
+      data.setMonth(data.getMonth() - i);
+      const ano = data.getFullYear();
+      const mes = data.getMonth();
 
-        return {
-          periodo: day,
-          receitas,
-          despesas,
-          saldo: receitas - despesas,
-        };
+      const transacoesMes = filteredByPeriod.filter((t) => {
+        const [anoTransacao, mesTransacao] = t.data.split("T")[0].split("-");
+        return Number(anoTransacao) === ano && Number(mesTransacao) - 1 === mes;
       });
-    } else if (selectedPeriod === "mes") {
-      // Agrupar por dia do mês
-      const now = new Date();
-      const primeiroDiaMes = getPrimeiroDiaMes();
-      const diasNoMes = new Date(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        0
-      ).getDate();
 
-      chartData = Array.from({ length: diasNoMes }, (_, i) => {
-        const dia = String(i + 1).padStart(2, "0");
-        const dataDia = `${now.getFullYear()}-${String(
-          now.getMonth() + 1
-        ).padStart(2, "0")}-${dia}`;
+      const receitas = transacoesMes
+        .filter((t) => t.tipo === "receita")
+        .reduce((sum, t) => sum + Number(t.valor), 0);
+      const despesas = transacoesMes
+        .filter((t) => t.tipo === "despesa")
+        .reduce((sum, t) => sum + Number(t.valor), 0);
 
-        const transacoesDia = filteredByPeriod.filter(
-          (t) => t.data.split("T")[0] === dataDia
-        );
-
-        const receitas = transacoesDia
-          .filter((t) => t.tipo === "receita")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-        const despesas = transacoesDia
-          .filter((t) => t.tipo === "despesa")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-
-        return {
-          periodo: dia,
-          receitas,
-          despesas,
-          saldo: receitas - despesas,
-        };
-      });
-    } else if (selectedPeriod === "trimestre") {
-      // Agrupar por trimestre dos últimos 4 trimestres
-      for (let i = 3; i >= 0; i--) {
-        const quarterYear = new Date().getFullYear() - Math.floor(i / 4);
-        const quarterIndex = (new Date().getMonth() / 3 - i + 4) % 4;
-        const quarterStart = quarterIndex * 3;
-
-        const quarterTransactions = filteredByPeriod.filter((t) => {
-          const [ano, mes, dia] = t.data.split("T")[0].split("-");
-          const transactionDate = new Date(
-            Number(ano),
-            Number(mes) - 1,
-            Number(dia)
-          );
-          return (
-            transactionDate.getFullYear() === quarterYear &&
-            transactionDate.getMonth() >= quarterStart &&
-            transactionDate.getMonth() < quarterStart + 3
-          );
-        });
-
-        const receitas = quarterTransactions
-          .filter((t) => t.tipo === "receita")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-        const despesas = quarterTransactions
-          .filter((t) => t.tipo === "despesa")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-
-        chartData.push({
-          periodo: `Q${quarterIndex + 1} ${quarterYear}`,
+              chartData.push({
+          periodo: `${meses[mes]} ${ano}`,
           receitas,
           despesas,
           saldo: receitas - despesas,
         });
       }
-    } else if (selectedPeriod === "ano") {
-      // Agrupar por ano dos últimos 5 anos
-      for (let i = 4; i >= 0; i--) {
-        const targetYear = new Date().getFullYear() - i;
-        const yearTransactions = filteredByPeriod.filter((t) => {
-          const [ano, mes, dia] = t.data.split("T")[0].split("-");
-          const transactionDate = new Date(
-            Number(ano),
-            Number(mes) - 1,
-            Number(dia)
-          );
-          return transactionDate.getFullYear() === targetYear;
-        });
-
-        const receitas = yearTransactions
-          .filter((t) => t.tipo === "receita")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-        const despesas = yearTransactions
-          .filter((t) => t.tipo === "despesa")
-          .reduce((sum, t) => sum + Number(t.valor), 0);
-
-        chartData.push({
-          periodo: targetYear.toString(),
-          receitas,
-          despesas,
-          saldo: receitas - despesas,
-        });
-      }
-    }
 
     // Calcular dados por categoria
     const categoryMap = new Map<string, CategoryData>();
@@ -344,7 +324,7 @@ const Relatorios = () => {
       categoryData,
       filteredTransactions,
     };
-  }, [transacoes, selectedPeriod, selectedCategory, loadingTransacoes]);
+  }, [transacoes, selectedCategory, loadingTransacoes, dataInicial, dataFinal]);
 
   const { chartData, categoryData, filteredTransactions } = processedData;
 
@@ -367,7 +347,7 @@ const Relatorios = () => {
     try {
       // Preparar dados para exportação
       const reportData = {
-        periodo: selectedPeriod,
+        periodo: dataInicial && dataFinal ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}` : "Mês atual",
         dataGeracao: new Date().toLocaleDateString("pt-BR"),
         resumo: {
           totalReceitas: totalReceitas,
@@ -397,7 +377,7 @@ const Relatorios = () => {
       link.setAttribute("href", url);
       link.setAttribute(
         "download",
-        `relatorio-financeiro-${selectedPeriod}-${
+        `relatorio-financeiro-${dataInicial && dataFinal ? `${dataInicial}-${dataFinal}` : "mes-atual"}-${
           new Date().toISOString().split("T")[0]
         }.csv`
       );
@@ -432,9 +412,8 @@ const Relatorios = () => {
   );
   const saldoTotal = totalReceitas - totalDespesas;
 
-  // Obter chave correta para o eixo X baseado no período
+  // Obter chave correta para o eixo X
   const getXAxisKey = () => {
-    if (selectedPeriod === "mes") return "periodo";
     return "periodo";
   };
 
@@ -448,21 +427,10 @@ const Relatorios = () => {
               Relatórios
             </h2>
             <p className="text-sm md:text-base text-muted-foreground">
-              Visualize e analise seus dados financeiros - {selectedPeriod}
+              Visualize e analise seus dados financeiros
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-2">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-full sm:w-32">
-                <SelectValue placeholder="Período" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="semana">Semana</SelectItem>
-                <SelectItem value="mes">Mês</SelectItem>
-                <SelectItem value="trimestre">Trimestre</SelectItem>
-                <SelectItem value="ano">Ano</SelectItem>
-              </SelectContent>
-            </Select>
             <Button
               onClick={handleExportReport}
               variant="outline"
@@ -472,6 +440,58 @@ const Relatorios = () => {
               Exportar
             </Button>
           </div>
+        </div>
+
+        {/* Filtro de período */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">Período:</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="date"
+                value={dataInicial}
+                onChange={(e) => handleDataInicialChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data inicial"
+                max={dataFinal || undefined}
+              />
+              <span className="text-sm text-gray-500">até</span>
+              <Input
+                type="date"
+                value={dataFinal}
+                onChange={(e) => handleDataFinalChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data final"
+                min={dataInicial || undefined}
+              />
+            </div>
+            {(dataInicial || dataFinal) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={limparFiltros}
+                className="h-8 text-xs"
+              >
+                Limpar
+              </Button>
+            )}
+          </div>
+          {(dataInicial || dataFinal) && (
+            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              {dataInicial && dataFinal && (
+                <span>{formatarDataBR(dataInicial)} - {formatarDataBR(dataFinal)}</span>
+              )}
+              {dataInicial && !dataFinal && (
+                <span>A partir de {formatarDataBR(dataInicial)}</span>
+              )}
+              {!dataInicial && dataFinal && (
+                <span>Até {formatarDataBR(dataFinal)}</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Cards de resumo */}
@@ -488,7 +508,9 @@ const Relatorios = () => {
                 R$ {totalReceitas.toLocaleString("pt-BR")}
               </div>
               <p className="text-xs text-muted-foreground">
-                Período: {selectedPeriod}
+                {dataInicial && dataFinal
+                  ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}`
+                  : "Mês atual"}
               </p>
             </CardContent>
           </Card>
@@ -504,7 +526,9 @@ const Relatorios = () => {
                 R$ {totalDespesas.toLocaleString("pt-BR")}
               </div>
               <p className="text-xs text-muted-foreground">
-                Período: {selectedPeriod}
+                {dataInicial && dataFinal
+                  ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}`
+                  : "Mês atual"}
               </p>
             </CardContent>
           </Card>
@@ -549,7 +573,9 @@ const Relatorios = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center text-base md:text-lg">
                     <FileText className="w-5 h-5 mr-2 text-orange-500" />
-                    Receitas vs Despesas - {selectedPeriod}
+                    Receitas vs Despesas - {dataInicial && dataFinal
+                      ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}`
+                      : "Mês atual"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -576,7 +602,9 @@ const Relatorios = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center text-base md:text-lg">
                     <TrendingUp className="w-5 h-5 mr-2 text-orange-500" />
-                    Evolução do Saldo - {selectedPeriod}
+                    Evolução do Saldo - {dataInicial && dataFinal
+                      ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}`
+                      : "Mês atual"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -676,7 +704,9 @@ const Relatorios = () => {
             <Card className="w-full">
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <CardTitle className="text-base md:text-lg">
-                  Transações - {selectedPeriod}
+                  Transações - {dataInicial && dataFinal
+                    ? `${formatarDataBR(dataInicial)} - ${formatarDataBR(dataFinal)}`
+                    : "Mês atual"}
                 </CardTitle>
                 <Select
                   value={selectedCategory}
