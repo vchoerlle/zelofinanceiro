@@ -11,14 +11,14 @@ export const DemoVideoModal = ({ isOpen, onClose }: DemoVideoModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full p-0">
         <DialogHeader className="px-6 py-4">
-          <DialogTitle>Demonstração do Guarda Conta</DialogTitle>
+          <DialogTitle>Demonstração do Zelo Financeiro</DialogTitle>
         </DialogHeader>
         <div className="aspect-video w-full">
           <iframe
             width="100%"
             height="100%"
             src="https://www.youtube.com/embed/mc0qXzhbTBs"
-            title="Demonstração do Guarda Conta"
+            title="Demonstração do Zelo Financeiro"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

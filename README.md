@@ -1,4 +1,4 @@
-# 🏦 Guarda Conta - Controle Financeiro Inteligente
+# 🏦 Zelo Financeiro - Controle Financeiro Inteligente
 
 > **Gerencie suas finanças de forma simples e inteligente com dashboard intuitivo, relatórios detalhados e assistente integrado.**
 
@@ -9,7 +9,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Guarda Conta** é uma aplicação web moderna para controle financeiro pessoal e empresarial, desenvolvida com foco na simplicidade e eficiência. Com interface intuitiva e recursos avançados, oferece uma solução completa para gestão de finanças.
+O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pessoal e empresarial, desenvolvida com foco na simplicidade e eficiência. Com interface intuitiva e recursos avançados, oferece uma solução completa para gestão de finanças.
 
 ### 🎯 Objetivos
 
@@ -145,7 +145,7 @@ Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
 # Configurações da aplicação
-VITE_APP_NAME=Guarda Conta
+VITE_APP_NAME=Zelo Financeiro
 VITE_API_URL=http://localhost:3000/api
 
 # Configurações de terceiros (se aplicável)
@@ -205,7 +205,7 @@ export function MeuComponente({ titulo, valor, onAction }: ComponenteProps) {
 
 ## 👨‍💻 Autor
 
-**Equipe Guarda Conta**
+**Equipe Zelo Financeiro**
 
 - 🌐 Website: [clubdosoftware.com.br](https://clubdosoftware.com.br)
 

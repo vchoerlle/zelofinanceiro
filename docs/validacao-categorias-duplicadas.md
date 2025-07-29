@@ -2,7 +2,7 @@
 
 ## 📋 Resumo da Implementação
 
-Implementamos um sistema completo de validação para impedir a criação de categorias duplicadas no sistema Guarda Conta.
+Implementamos um sistema completo de validação para impedir a criação de categorias duplicadas no sistema Zelo Financeiro.
 
 ## 🔧 Mudanças Implementadas
 

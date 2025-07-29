@@ -8,7 +8,7 @@ export const Footer = () => {
               <div className="bg-orange-500 rounded-lg p-2">
                 <span className="text-white font-bold text-xl">M</span>
               </div>
-              <span className="text-2xl font-bold">Guarda Conta</span>
+              <span className="text-2xl font-bold">Zelo Financeiro</span>
             </div>
             <p className="text-gray-400 leading-relaxed">A plataforma completa para gerenciar suas finanças pessoais com inteligência.</p>
           </div>
@@ -53,7 +53,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 Guarda Conta. Todos os direitos reservados.</p>
+          <p>&copy; 2025 Zelo Financeiro. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>;

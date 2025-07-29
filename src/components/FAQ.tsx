@@ -4,8 +4,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export const FAQ = () => {
   const faqs = [
     {
-      question: "O Guarda Conta é gratuito?",
-answer: "Sim! O Guarda Conta oferece um plano gratuito completo com recursos essenciais para controle financeiro. Você pode fazer upgrade para planos pagos quando precisar de recursos avançados."
+          question: "O Zelo Financeiro é gratuito?",
+    answer: "Sim! O Zelo Financeiro oferece um plano gratuito completo com recursos essenciais para controle financeiro. Você pode fazer upgrade para planos pagos quando precisar de recursos avançados."
     },
     {
       question: "Como funciona a integração com WhatsApp?",
@@ -35,7 +35,7 @@ answer: "Sim! O Guarda Conta oferece um plano gratuito completo com recursos ess
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">PERGUNTAS FREQUENTES</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Tire suas dúvidas sobre o Guarda Conta
+            Tire suas dúvidas sobre o Zelo Financeiro
           </p>
         </div>
 

@@ -114,13 +114,13 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               {isCollapsed ? (
                 <img 
                   src="/logo-icon.png" 
-                  alt="Guarda Conta Icon" 
+                  alt="Zelo Financeiro Icon" 
                   className="h-8 w-8 transition-all duration-300"
                 />
               ) : (
                 <img 
                   src="/logo-full.png" 
-                  alt="Guarda Conta Logo" 
+                  alt="Zelo Financeiro Logo" 
                   className="h-48 w-auto transition-all duration-300"
                 />
               )}
