@@ -4,6 +4,7 @@ import { RegisterForm } from "@/components/auth/RegisterForm";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { useSearchParams } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 
@@ -33,7 +34,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 relative">
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle 
+          variant="outline" 
+          size="icon"
+          className="bg-background/80 backdrop-blur-sm border-border"
+        />
+      </div>
+      
       <div className="w-full max-w-md">
         <div className="bg-background rounded-lg shadow-lg p-8 border border-border">
           {/* Header */}
@@ -45,7 +55,7 @@ const Login = () => {
                 className="h-56 w-auto"
               />
             </div>
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
               {mode === "login" && "Faça login em sua conta"}
               {mode === "register" && "Crie sua conta"}
               {mode === "forgot-password" && "Recupere sua senha"}

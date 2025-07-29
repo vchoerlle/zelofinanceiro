@@ -59,13 +59,13 @@ export default function Veiculos() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Atrasada":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700";
       case "Em dia":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700";
       case "Pendente":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600";
     }
   };
 
@@ -83,7 +83,7 @@ export default function Veiculos() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Veículos
             </h1>
             <p className="text-sm md:text-base text-gray-600">
@@ -199,13 +199,13 @@ export default function Veiculos() {
                     manutencoesPendentes.map((manutencao) => (
                       <div
                         key={manutencao.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg gap-3"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg gap-3"
                       >
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm md:text-base">
+                          <h4 className="font-medium text-sm md:text-base text-gray-900 dark:text-gray-100">
                             {manutencao.tipo}
                           </h4>
-                          <p className="text-xs md:text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                             Sistema: {manutencao.sistema} •{" "}
                             {manutencao.veiculo?.marca}{" "}
                             {manutencao.veiculo?.modelo}
@@ -219,7 +219,7 @@ export default function Veiculos() {
                           >
                             {manutencao.status}
                           </Badge>
-                          <span className="text-xs md:text-sm text-gray-600">
+                          <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                             {manutencao.proximaEm}
                           </span>
                           <Button
@@ -235,7 +235,7 @@ export default function Veiculos() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-sm md:text-base text-gray-500 py-4">
+                    <p className="text-center text-sm md:text-base text-gray-500 dark:text-gray-400 py-4">
                       Nenhuma manutenção pendente encontrada.
                     </p>
                   )}

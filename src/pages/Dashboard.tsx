@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import {
   TrendingUp,
   TrendingDown,
@@ -12,42 +12,22 @@ import {
   TrendingUp as Investment,
   Car,
   AlertTriangle,
-  Package,
   CreditCard,
+  Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTransacoes } from "@/hooks/useTransacoes";
 import { useDespesas } from "@/hooks/useDespesas";
-import { useItensMercado } from "@/hooks/useItensMercado";
 import { useDividas } from "@/hooks/useDividas";
 import { useVeiculos } from "@/hooks/useVeiculos";
-import { useManutencoesPendentes } from "@/hooks/useManutencoesPendentes";
 import { useProfile } from "@/hooks/useProfile";
+import { useToast } from "@/hooks/use-toast";
 
 // Função para formatar a data corretamente
 const formatarData = (dataString: string) => {
   if (!dataString) return "";
   const [ano, mes, dia] = dataString.split("T")[0].split("-");
   return `${dia}/${mes}/${ano}`;
-};
-
-// Função para obter a data atual no formato do banco (YYYY-MM-DD)
-const getDataAtual = () => {
-  const now = new Date();
-  const ano = now.getFullYear();
-  const mes = String(now.getMonth() + 1).padStart(2, "0");
-  const dia = String(now.getDate()).padStart(2, "0");
-  return `${ano}-${mes}-${dia}`;
-};
-
-// Função para obter o primeiro dia da semana no formato do banco (YYYY-MM-DD)
-const getPrimeiroDiaSemana = () => {
-  const now = new Date();
-  const primeiroDiaSemana = new Date(now);
-  primeiroDiaSemana.setDate(now.getDate() - now.getDay());
-  return `${primeiroDiaSemana.getFullYear()}-${String(
-    primeiroDiaSemana.getMonth() + 1
-  ).padStart(2, "0")}-${String(primeiroDiaSemana.getDate()).padStart(2, "0")}`;
 };
 
 // Função para obter o primeiro dia do mês no formato do banco (YYYY-MM-DD)
@@ -69,67 +49,86 @@ const getUltimoDiaMes = () => {
   )}-${String(ultimoDia.getDate()).padStart(2, "0")}`;
 };
 
-// Função para obter o primeiro dia do ano no formato do banco (YYYY-MM-DD)
-const getPrimeiroDiaAno = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-01-01`;
-};
-
-// Função para obter o último dia do ano no formato do banco (YYYY-MM-DD)
-const getUltimoDiaAno = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-12-31`;
-};
-
-// Função para obter o último dia da semana no formato do banco (YYYY-MM-DD)
-const getUltimoDiaSemana = () => {
-  const now = new Date();
-  const ultimoDiaSemana = new Date(now);
-  ultimoDiaSemana.setDate(now.getDate() + (6 - now.getDay()));
-  return `${ultimoDiaSemana.getFullYear()}-${String(
-    ultimoDiaSemana.getMonth() + 1
-  ).padStart(2, "0")}-${String(ultimoDiaSemana.getDate()).padStart(2, "0")}`;
-};
-
-// Função para comparar datas no formato do banco (YYYY-MM-DD)
-const compararDatas = (data1: string, data2: string) => {
-  return data1.split("T")[0] === data2;
-};
-
-// Função para formatar o nome do mês
-const formatarMes = (data: Date) => {
-  const meses = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro",
-  ];
-  return `${meses[data.getMonth()]} de ${data.getFullYear()}`;
-};
-
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedPeriod, setSelectedPeriod] = useState("mes");
+  const { toast } = useToast();
+  const [dataInicial, setDataInicial] = useState(getPrimeiroDiaMes());
+  const [dataFinal, setDataFinal] = useState(getUltimoDiaMes());
 
   // Usar dados reais dos hooks
   const { transacoes, loading: loadingTransacoes } = useTransacoes();
   const { despesas, loading: loadingDespesas } = useDespesas();
-  const { itensMercado, loading: loadingItens } = useItensMercado();
   const { dividas, loading: loadingDividas } = useDividas();
   const { veiculos, loading: loadingVeiculos } = useVeiculos();
   const { profile } = useProfile();
 
   // Usar apenas um veículo para as manutenções se existir
   const primeiroVeiculo = veiculos && veiculos.length > 0 ? veiculos[0] : null;
-  // Remover o hook de manutenções pendentes por enquanto até resolver as dependências
+
+  // Função para aplicar filtro de data
+  const aplicarFiltroData = (dataString: string) => {
+    if (!dataInicial && !dataFinal) {
+      return true; // Se não há filtro de data, retorna todas
+    }
+
+    const dataItem = dataString.split('T')[0]; // Pega apenas a data (YYYY-MM-DD)
+
+    if (dataInicial && dataFinal) {
+      // Filtro com data inicial e final
+      return dataItem >= dataInicial && dataItem <= dataFinal;
+    } else if (dataInicial) {
+      // Apenas data inicial
+      return dataItem >= dataInicial;
+    } else if (dataFinal) {
+      // Apenas data final
+      return dataItem <= dataFinal;
+    }
+
+    return true;
+  };
+
+  // Função para validar datas
+  const validarDatas = () => {
+    if (dataInicial && dataFinal && dataInicial > dataFinal) {
+      toast({
+        title: "Erro",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  // Função para lidar com mudança de data inicial
+  const handleDataInicialChange = (value: string) => {
+    setDataInicial(value);
+    if (value && dataFinal && value > dataFinal) {
+      toast({
+        title: "Aviso",
+        description: "A data inicial não pode ser maior que a data final",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para lidar com mudança de data final
+  const handleDataFinalChange = (value: string) => {
+    setDataFinal(value);
+    if (value && dataInicial && dataInicial > value) {
+      toast({
+        title: "Aviso",
+        description: "A data final não pode ser menor que a data inicial",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para limpar filtros
+  const limparFiltros = () => {
+    setDataInicial(getPrimeiroDiaMes());
+    setDataFinal(getUltimoDiaMes());
+  };
 
   // Processar dados com useMemo para performance
   const processedData = useMemo(() => {
@@ -141,46 +140,17 @@ const Dashboard = () => {
         totalDespesas: 0,
         saldoPeriodo: 0,
         percentualDespesas: 0,
-        totalReceitasAnterior: 0,
       };
     }
 
-    const hoje = getDataAtual();
-
     // Filtrar transações (receitas) por período
     const transacoesFiltradas = transacoes.filter((transacao) => {
-      const dataTransacao = transacao.data.split("T")[0];
-
-      switch (selectedPeriod) {
-        case "dia":
-          return dataTransacao === hoje;
-        case "semana":
-          return dataTransacao >= getPrimeiroDiaSemana() && dataTransacao <= getUltimoDiaSemana();
-        case "mes":
-          return dataTransacao >= getPrimeiroDiaMes() && dataTransacao <= getUltimoDiaMes();
-        case "ano":
-          return dataTransacao >= getPrimeiroDiaAno() && dataTransacao <= getUltimoDiaAno();
-        default:
-          return true;
-      }
+      return aplicarFiltroData(transacao.data);
     });
 
     // Filtrar despesas por período (usando data de vencimento)
     const despesasFiltradas = despesas.filter((despesa) => {
-      const dataVencimento = despesa.data.split("T")[0];
-
-      switch (selectedPeriod) {
-        case "dia":
-          return dataVencimento === hoje;
-        case "semana":
-          return dataVencimento >= getPrimeiroDiaSemana() && dataVencimento <= getUltimoDiaSemana();
-        case "mes":
-          return dataVencimento >= getPrimeiroDiaMes() && dataVencimento <= getUltimoDiaMes();
-        case "ano":
-          return dataVencimento >= getPrimeiroDiaAno() && dataVencimento <= getUltimoDiaAno();
-        default:
-          return true;
-      }
+      return aplicarFiltroData(despesa.data);
     });
 
     const totalReceitas = transacoesFiltradas
@@ -190,32 +160,6 @@ const Dashboard = () => {
     // Usar despesas da tabela despesas (data de vencimento)
     const totalDespesas = despesasFiltradas
       .reduce((total, despesa) => total + Number(despesa.valor), 0);
-
-    // Calcula o período anterior
-    const getPeriodoAnterior = () => {
-      const hoje = new Date();
-      switch (selectedPeriod) {
-        case "dia":
-          return new Date(hoje.setDate(hoje.getDate() - 1)).toISOString().split('T')[0];
-        case "semana":
-          return new Date(hoje.setDate(hoje.getDate() - 7)).toISOString().split('T')[0];
-        case "mes":
-          return new Date(hoje.setMonth(hoje.getMonth() - 1)).toISOString().split('T')[0];
-        case "ano":
-          return new Date(hoje.setFullYear(hoje.getFullYear() - 1)).toISOString().split('T')[0];
-        default:
-          return '';
-      }
-    };
-
-    // Calcula receitas do período anterior
-    const totalReceitasAnterior = transacoes
-      .filter(t => {
-        const dataTransacao = t.data.split('T')[0];
-        const inicioPeriodoAnterior = getPeriodoAnterior();
-        return t.tipo === "receita" && dataTransacao >= inicioPeriodoAnterior;
-      })
-      .reduce((total, transacao) => total + Number(transacao.valor), 0);
 
     const saldoPeriodo = totalReceitas - totalDespesas;
     
@@ -241,9 +185,8 @@ const Dashboard = () => {
       saldoPeriodo,
       percentualSaldo,
       percentualDespesas,
-      totalReceitasAnterior,
     };
-  }, [transacoes, despesas, selectedPeriod, loadingTransacoes, loadingDespesas]);
+  }, [transacoes, despesas, dataInicial, dataFinal, loadingTransacoes, loadingDespesas]);
 
   const {
     transacoesFiltradas,
@@ -253,7 +196,6 @@ const Dashboard = () => {
     saldoPeriodo,
     percentualSaldo,
     percentualDespesas,
-    totalReceitasAnterior,
   } = processedData;
 
   // Função para obter ícone da categoria
@@ -291,10 +233,7 @@ const Dashboard = () => {
     return cores.default;
   };
 
-  // Itens com estoque baixo (usar nomes corretos das propriedades)
-  const itensEstoqueBaixo = itensMercado.filter(
-    (item) => item.status === "estoque_baixo" || item.status === "sem_estoque"
-  );
+
 
           // Parcelamentos vencidos (usar nomes corretos das propriedades)
   const dividasVencidas = dividas.filter(
@@ -327,28 +266,14 @@ const Dashboard = () => {
   const user = {
     name: profile?.name || "Usuário",
     getCurrentPeriod: () => {
-      // Ajusta para o timezone do Brasil (UTC-3)
-      const now = new Date();
-      const offset = -3; // UTC-3 (Brasil)
-      const today = new Date(now.getTime() + offset * 60 * 60 * 1000);
-
-      switch (selectedPeriod) {
-        case "dia": {
-          const dataFormatada = formatarData(today.toISOString());
-          return dataFormatada;
-        }
-        case "semana": {
-          const startOfWeek = new Date(today);
-          startOfWeek.setDate(today.getDate() - today.getDay());
-          return `Semana de ${formatarData(startOfWeek.toISOString())}`;
-        }
-        case "mes":
-          return formatarMes(today);
-        case "ano":
-          return today.getFullYear().toString();
-        default:
-          return "Período atual";
+      if (dataInicial && dataFinal) {
+        return `${formatarData(dataInicial)} a ${formatarData(dataFinal)}`;
+      } else if (dataInicial) {
+        return `A partir de ${formatarData(dataInicial)}`;
+      } else if (dataFinal) {
+        return `Até ${formatarData(dataFinal)}`;
       }
+      return "Período atual";
     },
   };
 
@@ -419,28 +344,59 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <div className="w-full sm:w-auto">
-            <Tabs
-              value={selectedPeriod}
-              onValueChange={setSelectedPeriod}
-              className="w-full sm:w-auto"
-            >
-              <TabsList className="w-full sm:w-auto grid grid-cols-4 sm:flex">
-                <TabsTrigger value="dia" className="text-sm">
-                  Dia
-                </TabsTrigger>
-                <TabsTrigger value="semana" className="text-sm">
-                  Semana
-                </TabsTrigger>
-                <TabsTrigger value="mes" className="text-sm">
-                  Mês
-                </TabsTrigger>
-                <TabsTrigger value="ano" className="text-sm">
-                  Ano
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+
+        </div>
+
+        {/* Filtro de Período */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">Período:</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="date"
+                value={dataInicial}
+                onChange={(e) => handleDataInicialChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data inicial"
+                max={dataFinal || undefined}
+              />
+              <span className="text-sm text-gray-500">até</span>
+              <Input
+                type="date"
+                value={dataFinal}
+                onChange={(e) => handleDataFinalChange(e.target.value)}
+                className="w-40 h-8 text-sm"
+                placeholder="Data final"
+                min={dataInicial || undefined}
+              />
+            </div>
+            {(dataInicial || dataFinal) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={limparFiltros}
+                className="h-8 text-xs"
+              >
+                Limpar
+              </Button>
+            )}
           </div>
+          {(dataInicial || dataFinal) && (
+            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              {dataInicial && dataFinal && (
+                <span>{formatarData(dataInicial)} - {formatarData(dataFinal)}</span>
+              )}
+              {dataInicial && !dataFinal && (
+                <span>A partir de {formatarData(dataInicial)}</span>
+              )}
+              {!dataInicial && dataFinal && (
+                <span>Até {formatarData(dataFinal)}</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Financial Stats Cards */}
@@ -516,7 +472,7 @@ const Dashboard = () => {
         <Card className="p-4 md:p-6 mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-4 md:mb-6">
                             <h2 className="text-lg md:text-xl font-bold text-foreground">
-              Últimas Transações - {selectedPeriod}
+              Últimas Transações
             </h2>
             <Button
               variant="ghost"
@@ -571,73 +527,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Alert Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-          {/* Estoque Baixo Card */}
-          <Card className="p-4 md:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="bg-red-100 rounded-full p-2 md:p-3">
-                  <Package className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-base md:text-lg font-bold text-foreground">
-                    Estoque Baixo
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    {itensEstoqueBaixo.length} item
-                    {itensEstoqueBaixo.length !== 1 ? "s" : ""} precisa
-                    {itensEstoqueBaixo.length === 1 ? "" : "m"} de atenção
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                className="text-orange-600 hover:text-orange-700 text-sm"
-                onClick={() => navigate("/mercado")}
-              >
-                Ver todos
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {itensEstoqueBaixo.slice(0, 3).map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-red-50 border border-red-100"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        item.status === "sem_estoque"
-                          ? "bg-red-600"
-                          : "bg-yellow-500"
-                      }`}
-                    ></div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-foreground">
-                        {item.descricao}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {item.quantidade_atual}/{item.quantidade_ideal}{" "}
-                        {item.unidade_medida}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${
-                      item.status === "sem_estoque"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {item.status === "sem_estoque"
-                      ? "Sem estoque"
-                      : "Estoque baixo"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
+        <div className="grid grid-cols-1 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Parcelamentos Vencidos Card */}
           <Card className="p-4 md:p-6">
             <div className="flex items-center justify-between mb-4">

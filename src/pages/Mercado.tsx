@@ -131,11 +131,11 @@ const Mercado = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lista de Compras</h1>
+            <h1 className="text-2xl font-bold text-foreground">Lista de Compras</h1>
             <p className="text-gray-600">Gerencie sua lista de compras do mercado</p>
           </div>
           <div className="flex gap-2">
@@ -181,28 +181,28 @@ const Mercado = () => {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total de Itens</p>
-                <p className="text-2xl font-bold text-gray-900">{itensLista.length}</p>
+                <p className="text-sm text-muted-foreground">Total de Itens</p>
+                <p className="text-2xl font-bold text-foreground">{itensLista.length}</p>
               </div>
-              <ShoppingCart className="w-8 h-8 text-orange-500" />
+              <ShoppingCart className="w-8 h-8 text-muted-foreground" />
             </div>
           </Card>
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">A Comprar</p>
+                <p className="text-sm text-muted-foreground">A Comprar</p>
                 <p className="text-2xl font-bold text-blue-600">{itensNaoComprados.length}</p>
               </div>
-              <Circle className="w-8 h-8 text-blue-500" />
+              <Circle className="w-8 h-8 text-muted-foreground" />
             </div>
           </Card>
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Comprados</p>
+                <p className="text-sm text-muted-foreground">Comprados</p>
                 <p className="text-2xl font-bold text-green-600">{itensComprados.length}</p>
               </div>
-              <CheckCircle className="w-8 h-8 text-green-500" />
+              <CheckCircle className="w-8 h-8 text-muted-foreground" />
             </div>
           </Card>
         </div>
@@ -213,12 +213,12 @@ const Mercado = () => {
             {/* Itens não comprados */}
             {itensNaoComprados.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">A Comprar</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">A Comprar</h3>
                 <div className="space-y-2">
                   {itensNaoComprados.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
+                      className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700"
                     >
                       <div className="flex items-center space-x-3">
                         <Checkbox
@@ -229,8 +229,8 @@ const Mercado = () => {
                           className="text-green-600"
                         />
                         <div>
-                          <p className="font-medium text-gray-900">{item.descricao}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{item.descricao}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {item.quantidade} {getUnidadeMedidaLabel(item.unidade_medida)}
                           </p>
                         </div>
@@ -282,12 +282,12 @@ const Mercado = () => {
             {/* Itens comprados */}
             {itensComprados.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Comprados</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Comprados</h3>
                 <div className="space-y-2">
                   {itensComprados.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
+                      className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700"
                     >
                       <div className="flex items-center space-x-3">
                         <Checkbox
@@ -298,8 +298,8 @@ const Mercado = () => {
                           className="text-green-600"
                         />
                         <div>
-                          <p className="font-medium text-gray-900 line-through">{item.descricao}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 line-through">{item.descricao}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {item.quantidade} {getUnidadeMedidaLabel(item.unidade_medida)}
                           </p>
                         </div>
@@ -351,8 +351,8 @@ const Mercado = () => {
             {/* Estado vazio */}
             {itensFiltrados.length === 0 && (
               <div className="text-center py-8">
-                <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <ShoppingCart className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">
                   {filtro ? "Nenhum item encontrado com essa busca." : "Sua lista de compras está vazia."}
                 </p>
                 {!filtro && (
