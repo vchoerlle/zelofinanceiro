@@ -22,6 +22,7 @@ import { useDividas } from "@/hooks/useDividas";
 import { useVeiculos } from "@/hooks/useVeiculos";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 
 // Função para formatar a data corretamente
 const formatarData = (dataString: string) => {
@@ -337,14 +338,19 @@ const Dashboard = () => {
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-foreground">
-                Olá, {user.name}
+                Olá, {profile?.name || "Usuário"}
               </h1>
               <p className="text-sm md:text-base text-gray-600">
-                {user.getCurrentPeriod()}
+                Bem-vindo ao seu dashboard
               </p>
             </div>
           </div>
 
+        </div>
+
+        {/* Status da Assinatura */}
+        <div className="mb-6 md:mb-8">
+          <SubscriptionStatus />
         </div>
 
         {/* Filtro de Período */}
