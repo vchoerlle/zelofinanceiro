@@ -633,11 +633,15 @@ export type Database = {
         Row: {
           avatar_url: string | null;
           created_at: string;
+          dias_contratados: number | null;
+          dias_restantes: number | null;
           email: string | null;
           endereco: string | null;
           id: string;
           name: string;
           organization_name: string | null;
+          plano_familiar: string | null;
+          setup_concluido: boolean | null;
           telefone: string | null;
           updated_at: string;
           user_id: string;
@@ -645,11 +649,15 @@ export type Database = {
         Insert: {
           avatar_url?: string | null;
           created_at?: string;
+          dias_contratados?: number | null;
+          dias_restantes?: number | null;
           email?: string | null;
           endereco?: string | null;
           id?: string;
           name: string;
           organization_name?: string | null;
+          plano_familiar?: string | null;
+          setup_concluido?: boolean | null;
           telefone?: string | null;
           updated_at?: string;
           user_id: string;
@@ -657,11 +665,15 @@ export type Database = {
         Update: {
           avatar_url?: string | null;
           created_at?: string;
+          dias_contratados?: number | null;
+          dias_restantes?: number | null;
           email?: string | null;
           endereco?: string | null;
           id?: string;
           name?: string;
           organization_name?: string | null;
+          plano_familiar?: string | null;
+          setup_concluido?: boolean | null;
           telefone?: string | null;
           updated_at?: string;
           user_id?: string;
@@ -886,6 +898,12 @@ export type Database = {
           user_id: string;
         };
         Returns: boolean;
+      };
+      setup_initial_data: {
+        Args: {
+          user_uuid: string;
+        };
+        Returns: Json;
       };
     };
     Enums: {

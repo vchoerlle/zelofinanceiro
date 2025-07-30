@@ -23,6 +23,7 @@ import { useVeiculos } from "@/hooks/useVeiculos";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
+import { InitialSetupModal } from "@/components/InitialSetupModal";
 
 // Função para formatar a data corretamente
 const formatarData = (dataString: string) => {
@@ -642,6 +643,9 @@ const Dashboard = () => {
           </div>
         </Card>
       </div>
+      
+      {/* Modal de Setup Inicial */}
+      <InitialSetupModal />
     </DashboardLayout>
   );
 };
