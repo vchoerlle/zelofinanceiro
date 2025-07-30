@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { translateAuthError } from "@/lib/auth-utils";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -54,7 +55,7 @@ export const useAuth = () => {
     if (error) {
       toast({
         title: "Erro no cadastro",
-        description: error.message,
+        description: translateAuthError(error.message),
         variant: "destructive",
       });
       return { error };
@@ -77,7 +78,7 @@ export const useAuth = () => {
     if (error) {
       toast({
         title: "Erro no login",
-        description: error.message,
+        description: translateAuthError(error.message),
         variant: "destructive",
       });
       return { error };
@@ -118,7 +119,7 @@ export const useAuth = () => {
     if (error) {
       toast({
         title: "Erro ao enviar email",
-        description: error.message,
+        description: translateAuthError(error.message),
         variant: "destructive",
       });
       return { error };

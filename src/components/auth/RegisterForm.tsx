@@ -5,6 +5,44 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { checkEmailExists } from "@/lib/auth-utils";
+
+// Função para validar senha
+const validatePassword = (password: string): { isValid: boolean; message: string } => {
+  if (password.length < 6) {
+    return { isValid: false, message: "A senha deve ter pelo menos 6 caracteres." };
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra minúscula." };
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra maiúscula." };
+  }
+  
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um número." };
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um símbolo." };
+  }
+  
+  return { isValid: true, message: "" };
+};
+
+// Função para validar email
+const validateEmail = (email: string): { isValid: boolean; message: string } => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { isValid: false, message: "Email inválido. Digite um email válido." };
+  }
+  return { isValid: true, message: "" };
+};
+
+
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -20,19 +58,75 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const { signUp } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Função para validar email em tempo real
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+    
+    if (emailValue === "") {
+      setEmailError("");
+      return;
+    }
+    
+    const emailValidation = validateEmail(emailValue);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.message);
+    } else {
+      setEmailError("");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (password !== confirmPassword) {
+    // Validar email
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      toast({
+        title: "Email inválido",
+        description: emailValidation.message,
+        variant: "destructive",
+      });
       setIsLoading(false);
       return;
     }
 
-    if (password.length < 6) {
+    if (password !== confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validar senha
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Senha inválida",
+        description: passwordValidation.message,
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Verificar se email já está cadastrado
+    const emailExists = await checkEmailExists(email);
+    if (emailExists) {
+      toast({
+        title: "Email já cadastrado",
+        description: "Este email já está cadastrado. Tente fazer login ou use outro email.",
+        variant: "destructive",
+      });
       setIsLoading(false);
       return;
     }
@@ -88,10 +182,14 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           placeholder="seu@email.com"
+          className={emailError ? "border-red-500" : ""}
           required
         />
+        {emailError && (
+          <p className="text-sm text-red-500">{emailError}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -102,7 +200,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mín. 6 chars: a-z, A-Z, 0-9, símbolo"
             required
           />
           <Button

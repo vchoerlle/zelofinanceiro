@@ -383,6 +383,8 @@ export default function Veiculos() {
                     <p className="text-center text-sm md:text-base text-gray-500 dark:text-gray-400 py-4">
                       {manutencoesPendentes.length > 0 
                         ? "Nenhuma manutenção encontrada com os filtros aplicados."
+                        : veiculos.length > 0 && tiposManutencao.length > 0 && vinculos.length === 0
+                        ? "Nenhum veículo está vinculado a tipos de manutenção. Use o botão 'Vincular Tipos' para criar vínculos."
                         : "Nenhuma manutenção pendente encontrada."
                       }
                     </p>

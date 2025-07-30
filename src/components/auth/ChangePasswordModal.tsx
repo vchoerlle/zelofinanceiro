@@ -6,6 +6,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { translateAuthError } from "@/lib/auth-utils";
+
+// Função para validar senha
+const validatePassword = (password: string): { isValid: boolean; message: string } => {
+  if (password.length < 6) {
+    return { isValid: false, message: "A senha deve ter pelo menos 6 caracteres." };
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra minúscula." };
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra maiúscula." };
+  }
+  
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um número." };
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um símbolo." };
+  }
+  
+  return { isValid: true, message: "" };
+};
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -40,10 +66,12 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
       return;
     }
 
-    if (formData.newPassword.length < 6) {
+    // Validar senha
+    const passwordValidation = validatePassword(formData.newPassword);
+    if (!passwordValidation.isValid) {
       toast({
-        title: "Erro",
-        description: "A nova senha deve ter pelo menos 6 caracteres.",
+        title: "Senha inválida",
+        description: passwordValidation.message,
         variant: "destructive",
       });
       return;
@@ -61,7 +89,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
         console.error("Erro ao alterar senha:", error);
         toast({
           title: "Erro",
-          description: error.message || "Erro ao alterar senha. Tente novamente.",
+          description: translateAuthError(error.message) || "Erro ao alterar senha. Tente novamente.",
           variant: "destructive",
         });
         return;
@@ -117,6 +145,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
               type="password"
               value={formData.newPassword}
               onChange={(e) => handleInputChange('newPassword', e.target.value)}
+              placeholder="Mín. 6 chars: a-z, A-Z, 0-9, símbolo"
               required
             />
           </div>

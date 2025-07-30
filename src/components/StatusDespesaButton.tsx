@@ -47,7 +47,10 @@ export const StatusDespesaButton = ({
   size = 'default'
 }: StatusDespesaButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const config = statusConfig[status];
+  
+  // Verificar se o status existe no config, caso contrário usar 'pendente' como fallback
+  const validStatus = statusConfig[status] ? status : 'pendente';
+  const config = statusConfig[validStatus];
   const IconComponent = config.icon;
 
   const handleStatusChange = (newStatus: StatusDespesa) => {
@@ -116,7 +119,9 @@ export const StatusDespesaBadge = ({
   status: StatusDespesa; 
   className?: string;
 }) => {
-  const config = statusConfig[status];
+  // Verificar se o status existe no config, caso contrário usar 'pendente' como fallback
+  const validStatus = statusConfig[status] ? status : 'pendente';
+  const config = statusConfig[validStatus];
   const IconComponent = config.icon;
 
   return (

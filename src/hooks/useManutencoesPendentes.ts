@@ -39,11 +39,12 @@ export const useManutencoesPendentes = (
 ) => {
   const [manutencaoRealizada, setManutencaoRealizada] = useState<ManutencaoRealizada[]>([]);
   const [manutencoesPendentes, setManutencoesPendentes] = useState<ManutencaoPendente[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Iniciar como false para evitar loading desnecessário
   const { toast } = useToast();
 
   const fetchManutencaoRealizada = useCallback(async () => {
     try {
+      setLoading(true); // Definir loading como true apenas quando buscar dados
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -68,6 +69,8 @@ export const useManutencoesPendentes = (
         description: "Erro ao carregar manutenções realizadas",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false); // Sempre definir loading como false ao finalizar
     }
   }, [toast]);
 
@@ -248,17 +251,13 @@ export const useManutencoesPendentes = (
 
   // Recalcular quando as manutenções realizadas ou vínculos mudarem
   useEffect(() => {
-    if (veiculos.length > 0 && tiposManutencao.length > 0 && vinculos.length >= 0) {
+    // Sempre recalcular, mesmo que não haja vínculos (para mostrar lista vazia)
+    if (veiculos.length > 0 && tiposManutencao.length > 0) {
       calcularManutencoesPendentes();
     }
   }, [manutencaoRealizada, vinculos, veiculos, tiposManutencao, calcularManutencoesPendentes]);
 
-  // Definir loading como false quando os dados estiverem carregados
-  useEffect(() => {
-    if (veiculos.length > 0 && tiposManutencao.length > 0) {
-      setLoading(false);
-    }
-  }, [veiculos.length, tiposManutencao.length]);
+  // Remover lógica de loading duplicada - agora controlada pelo fetchManutencaoRealizada
 
   return {
     manutencoesPendentes,

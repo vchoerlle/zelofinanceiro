@@ -6,6 +6,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { translateAuthError } from "@/lib/auth-utils";
+
+// Função para validar senha
+const validatePassword = (password: string): { isValid: boolean; message: string } => {
+  if (password.length < 6) {
+    return { isValid: false, message: "A senha deve ter pelo menos 6 caracteres." };
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra minúscula." };
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos uma letra maiúscula." };
+  }
+  
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um número." };
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { isValid: false, message: "A senha deve conter pelo menos um símbolo." };
+  }
+  
+  return { isValid: true, message: "" };
+};
 
 interface ResetPasswordFormProps {
   onSwitchToLogin: () => void;
@@ -34,10 +60,12 @@ export const ResetPasswordForm = ({
       return;
     }
 
-    if (password.length < 6) {
+    // Validar senha
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
       toast({
-        title: "Erro",
-        description: "A senha deve ter pelo menos 6 caracteres.",
+        title: "Senha inválida",
+        description: passwordValidation.message,
         variant: "destructive",
       });
       return;
@@ -67,7 +95,7 @@ export const ResetPasswordForm = ({
       toast({
         title: "Erro",
         description:
-          error.message || "Erro ao redefinir senha. Tente novamente.",
+          translateAuthError(error.message) || "Erro ao redefinir senha. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -85,7 +113,7 @@ export const ResetPasswordForm = ({
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mín. 6 chars: a-z, A-Z, 0-9, símbolo"
             required
           />
           <Button

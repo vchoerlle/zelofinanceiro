@@ -207,14 +207,12 @@ export function MeuComponente({ titulo, valor, onAction }: ComponenteProps) {
 
 **Equipe Zelo Financeiro**
 
-- 🌐 Website: [clubdosoftware.com.br](https://clubdosoftware.com.br)
+- 🌐 Website: [zelofinanceiro.com.br](https://zelofinanceiro.com.br)
 
 ---
 
 <div align="center">
 
 **Feito com ❤️ para simplificar sua vida financeira**
-
-[🏠 Home](https://clubdosoftware.com.br) • [📚 Docs](https://clubdosoftware.com.br/guarda-conta.html)
 
 </div>

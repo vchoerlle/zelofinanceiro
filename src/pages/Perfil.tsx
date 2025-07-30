@@ -27,7 +27,8 @@ const Perfil = () => {
     email: "",
     telefone: "",
     endereco: "",
-    avatar: ""
+    avatar: "",
+    whatsappFamiliar: ""
   });
 
   // Carregar dados do perfil quando disponível
@@ -38,7 +39,8 @@ const Perfil = () => {
         email: user.email || "",
         telefone: profile.telefone || "",
         endereco: profile.endereco || "",
-        avatar: profile.avatar_url || ""
+        avatar: profile.avatar_url || "",
+        whatsappFamiliar: profile.whatsapp_familiar || ""
       });
     }
   }, [profile, user]);
@@ -97,7 +99,8 @@ const Perfil = () => {
       name: formData.nome,
       telefone: formData.telefone,
       endereco: formData.endereco,
-      avatar_url: formData.avatar
+      avatar_url: formData.avatar,
+      whatsapp_familiar: formData.whatsappFamiliar
     });
 
     if (success) {
@@ -114,7 +117,8 @@ const Perfil = () => {
         email: user.email || "",
         telefone: profile.telefone || "",
         endereco: profile.endereco || "",
-        avatar: profile.avatar_url || ""
+        avatar: profile.avatar_url || "",
+        whatsappFamiliar: profile.whatsapp_familiar || ""
       });
     }
   };
@@ -304,6 +308,18 @@ const Perfil = () => {
                   disabled={!isEditing}
                 />
               </div>
+              {profile?.plano_familiar === 'sim' && (
+                <div className="space-y-2">
+                  <Label htmlFor="whatsappFamiliar">Whatsapp Familiar</Label>
+                  <Input
+                    id="whatsappFamiliar"
+                    value={formData.whatsappFamiliar || ''}
+                    onChange={(e) => handleInputChange('whatsappFamiliar', e.target.value)}
+                    disabled={!isEditing}
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

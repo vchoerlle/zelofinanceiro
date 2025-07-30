@@ -589,7 +589,7 @@ Responda APENAS com o JSON, sem explicações adicionais.`;
                          </div>
                         <div>
                           <span className="text-gray-500">Data:</span>
-                          <p className="font-medium">{new Date(result.data).toLocaleDateString('pt-BR')}</p>
+                          <p className="font-medium">{result.data.split('-').reverse().join('/')}</p>
                         </div>
                       </div>
 

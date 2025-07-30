@@ -329,7 +329,7 @@ const Receitas = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-4 md:p-6">
             <div className="flex items-center space-x-4">
               <div className="bg-green-100 rounded-full p-2 md:p-3">
@@ -369,20 +369,6 @@ const Receitas = () => {
                   {(dataInicial || dataFinal) && (
                     <span className="text-blue-600 font-medium"> • Filtrado</span>
                   )}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 md:p-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-orange-100 rounded-full p-2 md:p-3">
-                <Calendar className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-xs md:text-sm text-gray-600">Categorias</p>
-                <p className="text-lg md:text-2xl font-bold text-foreground">
-                  {categoriasReceita.length}
                 </p>
               </div>
             </div>
