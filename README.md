@@ -30,22 +30,29 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **Gestão de Perfil** - Edição de dados pessoais e foto de perfil
 - **Sistema de Assinatura** - Controle de acesso baseado em dias restantes
 - **Bloqueio Automático** - Usuários com assinatura expirada são bloqueados automaticamente
+- **Proteção de Rotas** - Acesso controlado por autenticação
+- **Logout Automático** - Desconexão por inatividade ou assinatura expirada
 
 ### 💰 **Gestão Financeira Core**
 
 - **Dashboard Interativo** - Visão geral das finanças em tempo real
 - **Receitas & Despesas** - Controle completo de entradas e saídas
+- **Transações Unificadas** - Visualização consolidada de todas as movimentações
 - **Categorização Inteligente** - Organize suas transações por categorias personalizáveis
 - **Gestão de Parcelamentos** - Acompanhe e controle seus compromissos financeiros
 - **Metas Financeiras** - Defina e monitore objetivos financeiros
 - **Status de Pagamento** - Controle de status (Pago, Pendente, Atraso) para despesas
+- **Sistema de Dívidas** - Gestão completa de dívidas com parcelamento
+- **Visualização de Parcelas** - Controle detalhado de cada parcela
 
 ### 📊 **Relatórios e Análises**
 
 - **Relatórios Detalhados** - Análises profundas do comportamento financeiro
 - **Dashboard Empresarial** - Métricas específicas para negócios
-- **Visualizações Gráficas** - Gráficos e charts informativos
+- **Visualizações Gráficas** - Gráficos e charts informativos com Recharts
 - **Filtros por Período** - Análises customizadas por data
+- **Ordenação de Tabelas** - Sistema de ordenação inteligente
+- **Exportação de Dados** - Funcionalidade para exportar relatórios
 
 ### 🚗 **Gestão de Veículos** (Diferencial)
 
@@ -54,15 +61,54 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **Custos Operacionais** - Acompanhe gastos relacionados aos veículos
 - **Histórico de Manutenções** - Registro completo de serviços realizados
 - **Vinculação de Tipos** - Associação de tipos de manutenção aos veículos
+- **Manutenções Pendentes** - Sistema de alertas para manutenções necessárias
+- **Atualização de Quilometragem** - Controle automático de quando fazer manutenções
+- **Integração com Dívidas** - Conversão automática de manutenções em parcelamentos
 
-### 🛒 **Recursos Adicionais**
+### 🛒 **Sistema de Mercado Completo**
 
-- **Lista de Mercado** - Planeje suas compras com categorização
-- **Integração com IA** - Assistente inteligente para insights financeiros
+- **Lista de Compras** - Planeje suas compras com categorização
+- **Categorias de Mercado** - Organize itens por categorias personalizáveis
+- **Controle de Quantidade** - Unidades de medida (un, kg, g, l, ml, pct, cx, dz, pcs)
+- **Status de Compra** - Marque itens como comprados
+- **Limpeza Automática** - Remova itens já comprados
+- **Orçamentos de Mercado** - Controle de gastos por categoria
+- **Estimativas de Gastos** - Acompanhe quanto você gasta em cada categoria
+- **Itens de Mercado** - Cadastro de produtos com preços e categorias
+
+### 🤖 **Inteligência Artificial Integrada**
+
 - **Análise de Documentos** - Upload e análise de comprovantes via OpenAI
+- **Suporte a Múltiplos Formatos** - Imagens (JPEG, PNG, GIF) e PDFs
+- **Configuração de Modelos** - Escolha entre GPT-4o, GPT-4o Mini, GPT-4 Turbo
+- **Gestão de Chaves API** - Configuração segura de chaves OpenAI
+- **Resultados de Análise** - Aprovação/rejeição de resultados da IA
+- **Edição de Resultados** - Ajuste manual dos dados extraídos
+- **Histórico de Análises** - Registro completo de todas as análises
+- **Drag & Drop** - Interface intuitiva para upload de arquivos
+- **Validação de Arquivos** - Limite de 10MB e tipos suportados
+
+### 🎯 **Sistema de Metas Avançado**
+
+- **Tipos de Metas** - Economia, Receita, Despesa, Investimento
+- **Categorias de Metas** - Organização por categorias personalizáveis
+- **Controle de Progresso** - Acompanhamento visual do progresso
+- **Status de Metas** - Ativa, Concluída, Pausada, Vencida
+- **Datas de Início e Limite** - Controle temporal das metas
+- **Valores Alvo e Atual** - Acompanhamento financeiro detalhado
+- **Categorias Padrão** - Importação de categorias pré-definidas
+- **Filtros e Busca** - Encontre metas específicas rapidamente
+
+### 📱 **Interface e Experiência do Usuário**
+
 - **Interface Responsiva** - Acesso completo em dispositivos móveis
 - **Tema Escuro/Claro** - Alternância automática de temas
-- **Plano Familiar** - Campo para WhatsApp familiar (quando habilitado)
+- **Componentes Modernos** - Interface com shadcn/ui
+- **Notificações Toast** - Feedback visual para usuários
+- **Modais Interativos** - Interface limpa e organizada
+- **Navegação Intuitiva** - Menu lateral com todas as funcionalidades
+- **Botões Flutuantes** - Acesso rápido às principais ações
+- **Área de Rolagem Customizada** - Experiência de scroll otimizada
 
 ### 🛡️ **Sistema de Segurança**
 
@@ -70,6 +116,8 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **Validação Frontend** - Verificações em tempo real
 - **Proteção de Rotas** - Acesso controlado por autenticação
 - **Logout Automático** - Desconexão por inatividade ou assinatura expirada
+- **Validação de Entrada** - Verificações em todas as camadas
+- **Proteção contra Ataques** - Medidas de segurança implementadas
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -80,6 +128,16 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **Vite** - Build tool rápida e moderna
 - **Tailwind CSS** - Framework CSS utility-first
 - **shadcn/ui** - Componentes de UI modernos e acessíveis
+- **Radix UI** - Componentes primitivos acessíveis
+- **React Router DOM** - Roteamento da aplicação
+- **React Hook Form** - Gerenciamento de formulários
+- **Zod** - Validação de esquemas
+- **Lucide React** - Ícones modernos
+- **Recharts** - Biblioteca de gráficos
+- **Sonner** - Notificações toast
+- **Date-fns** - Manipulação de datas
+- **React Day Picker** - Seletor de datas
+- **Embla Carousel** - Carrosséis interativos
 
 ### **Backend & Banco de Dados**
 
@@ -87,13 +145,15 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **PostgreSQL** - Banco de dados relacional
 - **Row Level Security** - Políticas de segurança no banco
 - **Supabase Auth** - Sistema de autenticação completo
+- **TanStack Query** - Gerenciamento de estado do servidor
 
 ### **Ferramentas de Desenvolvimento**
 
 - **ESLint** - Linting de código
 - **PostCSS** - Processamento de CSS
 - **React Hooks** - Gerenciamento de estado e efeitos
-- **Lucide React** - Ícones modernos
+- **TypeScript ESLint** - Linting específico para TypeScript
+- **Autoprefixer** - Prefixos CSS automáticos
 
 ### **Integrações**
 
@@ -112,18 +172,37 @@ zelo-financeiro/
 │   ├── components/        # Componentes React
 │   │   ├── auth/         # Componentes de autenticação
 │   │   ├── ui/           # Componentes base (shadcn/ui)
-│   │   └── [modais]      # Modais específicos do domínio
+│   │   ├── modais/       # Modais específicos do domínio
+│   │   └── [componentes especializados]
 │   ├── pages/            # Páginas da aplicação
 │   │   ├── Dashboard.tsx
 │   │   ├── Receitas.tsx
 │   │   ├── Despesas.tsx
+│   │   ├── Transacoes.tsx
+│   │   ├── Dividas.tsx
+│   │   ├── Categorias.tsx
+│   │   ├── Relatorios.tsx
+│   │   ├── Metas.tsx
+│   │   ├── Mercado.tsx
 │   │   ├── Veiculos.tsx
+│   │   ├── IA.tsx
+│   │   ├── Perfil.tsx
 │   │   └── [...]
 │   ├── hooks/            # Hooks customizados
 │   │   ├── useAuth.ts
 │   │   ├── useSubscription.ts
+│   │   ├── useProfile.ts
+│   │   ├── useReceitas.ts
+│   │   ├── useDespesas.ts
+│   │   ├── useTransacoes.ts
+│   │   ├── useDividas.ts
+│   │   ├── useMetas.ts
+│   │   ├── useMercado.ts
+│   │   ├── useVeiculos.ts
+│   │   ├── useIA.ts
 │   │   └── [...]
 │   ├── lib/              # Utilitários e helpers
+│   ├── contexts/         # Contextos React
 │   ├── integrations/     # Integrações externas
 │   │   └── supabase/     # Configuração do Supabase
 │   └── [arquivos base]
@@ -142,6 +221,7 @@ zelo-financeiro/
 - npm ou yarn
 - Git
 - Conta no Supabase
+- Chave da API OpenAI (para funcionalidades de IA)
 
 ### **Instalação**
 
@@ -189,6 +269,7 @@ http://localhost:5173
 ```bash
 npm run dev          # Executa em modo desenvolvimento
 npm run build        # Build para produção
+npm run build:dev    # Build para desenvolvimento
 npm run preview      # Preview do build de produção
 npm run lint         # Executa o linting do código
 ```
@@ -205,6 +286,57 @@ npm run lint         # Executa o linting do código
 ALTER TABLE profiles ADD COLUMN dias_restantes INTEGER DEFAULT 30;
 ALTER TABLE profiles ADD COLUMN plano_familiar TEXT DEFAULT 'nao';
 ALTER TABLE profiles ADD COLUMN whatsapp_familiar TEXT;
+
+-- Tabelas principais
+CREATE TABLE transacoes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  tipo TEXT NOT NULL,
+  descricao TEXT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL,
+  data DATE NOT NULL,
+  categoria_id UUID REFERENCES categorias(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Tabelas para funcionalidades específicas
+CREATE TABLE metas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  titulo TEXT NOT NULL,
+  tipo TEXT NOT NULL,
+  valor_alvo DECIMAL(10,2) NOT NULL,
+  valor_atual DECIMAL(10,2) DEFAULT 0,
+  data_inicio DATE NOT NULL,
+  data_limite DATE NOT NULL,
+  status TEXT DEFAULT 'ativa',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE veiculos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  nome TEXT NOT NULL,
+  marca TEXT,
+  modelo TEXT,
+  ano INTEGER,
+  quilometragem_atual INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE ia_analysis_results (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  file_name TEXT NOT NULL,
+  tipo TEXT NOT NULL,
+  descricao TEXT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL,
+  categoria TEXT NOT NULL,
+  data DATE NOT NULL,
+  confianca INTEGER NOT NULL,
+  status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
 3. **Configure as políticas RLS** para segurança:
@@ -226,11 +358,20 @@ FOR ALL USING (
 Principais tabelas:
 - `profiles` - Perfis dos usuários
 - `transacoes` - Transações financeiras
-- `despesas` - Despesas específicas
 - `receitas` - Receitas específicas
+- `despesas` - Despesas específicas
+- `dividas` - Sistema de dívidas
+- `parcelas_dividas` - Parcelas das dívidas
 - `categorias` - Categorias de transações
+- `metas` - Metas financeiras
+- `categorias_metas` - Categorias de metas
 - `veiculos` - Veículos dos usuários
+- `tipos_manutencao` - Tipos de manutenção
 - `manutencoes` - Manutenções dos veículos
+- `lista_compras` - Lista de compras
+- `categorias_mercado` - Categorias de mercado
+- `orcamentos_mercado` - Orçamentos de mercado
+- `ia_analysis_results` - Resultados de análise de IA
 
 ## 🔧 Desenvolvimento
 
@@ -281,6 +422,8 @@ export const useSubscription = () => {
 - ✅ Validação tanto no frontend quanto no backend
 - ✅ Tratamento de erros consistente
 - ✅ Feedback visual para usuários
+- ✅ Hooks customizados para lógica reutilizável
+- ✅ Componentes modulares e reutilizáveis
 
 ## 📊 Performance
 
@@ -290,6 +433,8 @@ export const useSubscription = () => {
 - **CSS otimizado** com Tailwind CSS purge
 - **Imagens otimizadas** com WebP quando possível
 - **Cache inteligente** no Supabase
+- **TanStack Query** para cache de dados
+- **Componentes otimizados** com React.memo quando necessário
 
 ## 🔒 Segurança
 
@@ -298,6 +443,8 @@ export const useSubscription = () => {
 - **Validação de entrada** em todas as camadas
 - **Proteção contra ataques** comuns
 - **Logs de auditoria** para ações críticas
+- **Validação de arquivos** para uploads
+- **Sanitização de dados** antes de exibição
 
 ## 🧪 Testes
 
@@ -308,6 +455,13 @@ Para testar o sistema de assinatura:
 3. **Recarregue a página** - deve aparecer tela de bloqueio
 4. **Verifique no console** - não deve conseguir carregar dados
 
+Para testar a funcionalidade de IA:
+
+1. **Configure uma chave API válida** na página de IA
+2. **Faça upload de um comprovante** (imagem ou PDF)
+3. **Verifique a análise automática** dos dados
+4. **Aprove ou rejeite** os resultados
+
 ## 📈 Roadmap
 
 - [ ] **Notificações Push** - Alertas em tempo real
@@ -315,6 +469,11 @@ Para testar o sistema de assinatura:
 - [ ] **Integração com Bancos** - Importação automática
 - [ ] **App Mobile** - Versão nativa
 - [ ] **Multi-idioma** - Suporte a outros idiomas
+- [ ] **Exportação de Dados** - PDF, Excel, CSV
+- [ ] **Backup Automático** - Sincronização com nuvem
+- [ ] **Dashboard Personalizado** - Widgets customizáveis
+- [ ] **Integração com PIX** - Pagamentos diretos
+- [ ] **Sistema de Lembretes** - Notificações de vencimentos
 
 ## 👨‍💻 Autor
 
