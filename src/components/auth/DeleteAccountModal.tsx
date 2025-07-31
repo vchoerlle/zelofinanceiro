@@ -51,7 +51,7 @@ export const DeleteAccountModal = ({
 
       // Chamar a função RPC para deletar a conta
       const { data, error } = await supabase.rpc("delete_user_account", {
-        user_id: user.id,
+        user_uuid: user.id,
       });
 
       if (error) {
