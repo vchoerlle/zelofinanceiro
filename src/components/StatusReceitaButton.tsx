@@ -10,17 +10,16 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, AlertTriangle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type StatusDespesa = 'pago' | 'pendente' | 'atraso';
+type StatusReceita = 'recebida' | 'pendente' | 'vencida';
 
-interface StatusDespesaButtonProps {
-  status: StatusDespesa;
-  onStatusChange: (newStatus: StatusDespesa) => void;
-  className?: string;
+interface Props {
+  status?: StatusReceita;
+  onStatusChange: (status: StatusReceita) => void;
   size?: 'sm' | 'default' | 'lg';
 }
 
 const statusConfig = {
-  pago: {
+  recebida: {
     label: 'Pago',
     icon: CheckCircle,
     className: 'bg-green-100 text-green-800 hover:bg-green-200',
@@ -32,28 +31,21 @@ const statusConfig = {
     className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
     iconClassName: 'text-yellow-600'
   },
-  atraso: {
+  vencida: {
     label: 'Atraso',
     icon: AlertTriangle,
     className: 'bg-red-100 text-red-800 hover:bg-red-200',
     iconClassName: 'text-red-600'
   }
-};
+} as const;
 
-export const StatusDespesaButton = ({ 
-  status, 
-  onStatusChange, 
-  className,
-  size = 'default'
-}: StatusDespesaButtonProps) => {
+export const StatusReceitaButton = ({ status = 'pendente', onStatusChange, size = 'default' }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  // Verificar se o status existe no config, caso contrário usar 'pendente' como fallback
   const validStatus = statusConfig[status] ? status : 'pendente';
-  const config = statusConfig[validStatus];
+  const config = statusConfig[validStatus as StatusReceita];
   const IconComponent = config.icon;
 
-  const handleStatusChange = (newStatus: StatusDespesa) => {
+  const handleStatusChange = (newStatus: StatusReceita) => {
     onStatusChange(newStatus);
     setIsOpen(false);
   };
@@ -67,7 +59,6 @@ export const StatusDespesaButton = ({
           className={cn(
             "inline-flex items-center gap-2 border rounded-md px-3 py-1.5 align-middle",
             config.className,
-            className
           )}
         >
           <IconComponent className={cn("w-4 h-4", config.iconClassName)} />
@@ -76,33 +67,15 @@ export const StatusDespesaButton = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem
-          onClick={() => handleStatusChange('pago')}
-          className={cn(
-            "flex items-center gap-2",
-            status === 'pago' && "bg-green-50 text-green-700"
-          )}
-        >
+        <DropdownMenuItem onClick={() => handleStatusChange('recebida')} className={cn("flex items-center gap-2", status === 'recebida' && "bg-green-50 text-green-700")}>
           <CheckCircle className="w-4 h-4 text-green-600" />
           <span>Marcar como Pago</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleStatusChange('pendente')}
-          className={cn(
-            "flex items-center gap-2",
-            status === 'pendente' && "bg-yellow-50 text-yellow-700"
-          )}
-        >
+        <DropdownMenuItem onClick={() => handleStatusChange('pendente')} className={cn("flex items-center gap-2", status === 'pendente' && "bg-yellow-50 text-yellow-700")}>
           <Clock className="w-4 h-4 text-yellow-600" />
           <span>Marcar como Pendente</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleStatusChange('atraso')}
-          className={cn(
-            "flex items-center gap-2",
-            status === 'atraso' && "bg-red-50 text-red-700"
-          )}
-        >
+        <DropdownMenuItem onClick={() => handleStatusChange('vencida')} className={cn("flex items-center gap-2", status === 'vencida' && "bg-red-50 text-red-700")}>
           <AlertTriangle className="w-4 h-4 text-red-600" />
           <span>Marcar como Atraso</span>
         </DropdownMenuItem>
@@ -111,23 +84,4 @@ export const StatusDespesaButton = ({
   );
 };
 
-// Componente simples para exibir apenas o status (sem dropdown)
-export const StatusDespesaBadge = ({ 
-  status, 
-  className 
-}: { 
-  status: StatusDespesa; 
-  className?: string;
-}) => {
-  // Verificar se o status existe no config, caso contrário usar 'pendente' como fallback
-  const validStatus = statusConfig[status] ? status : 'pendente';
-  const config = statusConfig[validStatus];
-  const IconComponent = config.icon;
 
-  return (
-    <Badge className={cn(config.className, className)}>
-      <IconComponent className={cn("w-3 h-3 mr-1", config.iconClassName)} />
-      {config.label}
-    </Badge>
-  );
-}; 

@@ -45,6 +45,19 @@ O **Zelo Financeiro** é uma aplicação web moderna para controle financeiro pe
 - **Sistema de Dívidas** - Gestão completa de dívidas com parcelamento
 - **Visualização de Parcelas** - Controle detalhado de cada parcela
 
+### ✅ **Receitas Parceladas** (Novo)
+
+- **Criação de Receitas Parceladas** - Planeje recebimentos com número de parcelas, valor total, categoria e data do 1º recebimento
+- **Geração Automática de Parcelas** - Cada parcela vira uma linha em `receitas` com data prevista, descrição padronizada e valor da parcela
+- **Status Inteligente**
+  - Parent (receita parcelada):
+    - Quitada: todas as parcelas marcadas como recebida
+    - Vencida: existe parcela com data anterior a hoje que não está recebida
+    - Pendente: caso contrário (inclui “hoje” como pendente)
+  - Parcela: `pendente`, `recebida`, `vencida`
+- **Modal de Parcelas** - Visualize e altere status/valor/data de cada parcela, com resumo de totais/recebidas/pendentes/vencidas
+- **Exclusão Segura** - Remoção do parent exclui também as parcelas/receitas associadas
+
 ### 📊 **Relatórios e Análises**
 
 - **Relatórios Detalhados** - Análises profundas do comportamento financeiro
@@ -179,7 +192,8 @@ zelo-financeiro/
 │   │   ├── Receitas.tsx
 │   │   ├── Despesas.tsx
 │   │   ├── Transacoes.tsx
-│   │   ├── Dividas.tsx
+│   │   ├── Dividas.tsx                # Despesas Parceladas
+│   │   ├── ReceitasParceladas.tsx     # Receitas Parceladas
 │   │   ├── Categorias.tsx
 │   │   ├── Relatorios.tsx
 │   │   ├── Metas.tsx
@@ -196,6 +210,8 @@ zelo-financeiro/
 │   │   ├── useDespesas.ts
 │   │   ├── useTransacoes.ts
 │   │   ├── useDividas.ts
+│   │   ├── useReceitasParceladas.ts
+│   │   ├── useParcelasReceitas.ts
 │   │   ├── useMetas.ts
 │   │   ├── useMercado.ts
 │   │   ├── useVeiculos.ts
@@ -339,6 +355,77 @@ CREATE TABLE ia_analysis_results (
 );
 ```
 
+#### Tabelas para Receitas Parceladas (Novo)
+
+```sql
+-- Parent de receitas parceladas
+CREATE TABLE IF NOT EXISTS public.receitas_parceladas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  descricao TEXT NOT NULL,
+  pagador TEXT NOT NULL,
+  valor_total DECIMAL(10,2) NOT NULL,
+  valor_recebido DECIMAL(10,2) DEFAULT 0,
+  valor_restante DECIMAL(10,2) NOT NULL,
+  data_primeiro_recebimento DATE NOT NULL,
+  parcelas INTEGER NOT NULL DEFAULT 1,
+  parcelas_recebidas INTEGER NOT NULL DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'pendente' CHECK (status IN ('pendente','vencida','quitada')),
+  categoria_id UUID REFERENCES public.categorias(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Parcelas (vincula cada parcela ao parent e à linha em receitas)
+CREATE TABLE IF NOT EXISTS public.parcelas_receitas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  receita_parcelada_id UUID NOT NULL REFERENCES public.receitas_parceladas(id) ON DELETE CASCADE,
+  receita_id UUID NOT NULL REFERENCES public.receitas(id) ON DELETE CASCADE,
+  numero_parcela INTEGER NOT NULL,
+  data_prevista DATE NOT NULL,
+  valor_parcela DECIMAL(10,2) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pendente' CHECK (status IN ('pendente','recebida','vencida')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (receita_parcelada_id, numero_parcela),
+  UNIQUE (receita_id)
+);
+```
+
+#### Status em Receitas
+
+```sql
+ALTER TABLE public.receitas
+ADD COLUMN IF NOT EXISTS status VARCHAR(20)
+  DEFAULT 'pendente' CHECK (status IN ('pendente','recebida','vencida'));
+CREATE INDEX IF NOT EXISTS idx_receitas_status ON public.receitas(status);
+```
+
+#### Função + agendamento (cron) para marcar receitas vencidas (Novo)
+
+```sql
+CREATE OR REPLACE FUNCTION public.update_vencidas_receitas()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  UPDATE public.receitas
+  SET status = 'vencida'
+  WHERE status = 'pendente'
+    AND data < CURRENT_DATE; -- considere ajustar fuso com (now() AT TIME ZONE 'America/Sao_Paulo')::date
+END;
+$$;
+
+-- Agendar diariamente às 03:05 (via pg_cron)
+SELECT cron.schedule(
+  'update_vencidas_receitas_daily',
+  '5 3 * * *',
+  $$CALL public.update_vencidas_receitas();$$
+);
+```
+
 3. **Configure as políticas RLS** para segurança:
 
 ```sql
@@ -362,6 +449,8 @@ Principais tabelas:
 - `despesas` - Despesas específicas
 - `dividas` - Sistema de dívidas
 - `parcelas_dividas` - Parcelas das dívidas
+- `receitas_parceladas` - Parent de receitas parceladas (novo)
+- `parcelas_receitas` - Parcelas de receitas (novo)
 - `categorias` - Categorias de transações
 - `metas` - Metas financeiras
 - `categorias_metas` - Categorias de metas
@@ -412,6 +501,14 @@ export const useSubscription = () => {
   
   return { diasRestantes, isValid };
 };
+```
+
+```typescript
+// Exemplo de atualização de status de receita simples (tela Receitas)
+await supabase
+  .from('receitas')
+  .update({ status: 'recebida' })
+  .eq('id', receitaId);
 ```
 
 ### **Boas Práticas**

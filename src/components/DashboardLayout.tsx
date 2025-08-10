@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  CalendarCheck2,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -37,9 +38,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const menuItems = [
     { icon: Home, label: "Dashboard", path: "/dashboard" },
     { icon: TrendingUp, label: "Receitas", path: "/receitas" },
+    { icon: CalendarCheck2, label: "Receitas Parceladas", path: "/receitas-parceladas" },
     { icon: TrendingDown, label: "Despesas", path: "/despesas" },
+    { icon: PieChart, label: "Despesas Parceladas", path: "/dividas" },
     { icon: FileText, label: "Transações", path: "/transacoes" },
-    { icon: PieChart, label: "Parcelamentos", path: "/dividas" },
     { icon: Tag, label: "Categorias", path: "/categorias" },
     { icon: BarChart3, label: "Relatórios", path: "/relatorios" },
     { icon: Target, label: "Metas", path: "/metas" },

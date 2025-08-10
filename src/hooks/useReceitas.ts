@@ -11,6 +11,7 @@ export interface Receita {
   data: string;
   created_at: string;
   updated_at: string;
+  status?: 'pendente' | 'recebida' | 'vencida';
   categorias?: {
     nome: string;
     cor: string;
@@ -159,6 +160,22 @@ export const useReceitas = () => {
     }
   };
 
+  const updateReceitaStatus = async (id: string, status: 'pendente' | 'recebida' | 'vencida') => {
+    try {
+      const { error } = await supabase
+        .from('receitas')
+        .update({ status })
+        .eq('id', id);
+      if (error) throw error;
+      setReceitas(prev => prev.map(r => r.id === id ? { ...r, status } as any : r));
+      toast({ title: 'Status atualizado', description: 'Status da receita atualizado com sucesso!' });
+      return { error: null };
+    } catch (error: any) {
+      toast({ title: 'Erro ao atualizar status', description: error.message, variant: 'destructive' });
+      return { error };
+    }
+  };
+
   useEffect(() => {
     fetchReceitas();
   }, []);
@@ -169,6 +186,7 @@ export const useReceitas = () => {
     createReceita,
     updateReceita,
     deleteReceita,
+    updateReceitaStatus,
     refetch: fetchReceitas
   };
 };

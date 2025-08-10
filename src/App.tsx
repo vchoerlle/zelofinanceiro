@@ -6,6 +6,7 @@ import Transacoes from "./pages/Transacoes";
 import Dividas from "./pages/Dividas";
 import Categorias from "./pages/Categorias";
 import Relatorios from "./pages/Relatorios";
+import ReceitasParceladas from "./pages/ReceitasParceladas";
 import Metas from "./pages/Metas";
 import Mercado from "./pages/Mercado";
 import Veiculos from "./pages/Veiculos";
@@ -61,6 +62,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dividas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/receitas-parceladas"
+            element={
+              <ProtectedRoute>
+                <ReceitasParceladas />
               </ProtectedRoute>
             }
           />

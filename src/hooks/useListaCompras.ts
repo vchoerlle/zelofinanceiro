@@ -185,6 +185,33 @@ export const useListaCompras = () => {
     }
   };
 
+  const marcarTodosComoComprados = async () => {
+    try {
+      const { error } = await supabase
+        .from('lista_compras')
+        .update({ comprado: true })
+        .eq('comprado', false);
+
+      if (error) throw error;
+
+      setItensLista(prev => prev.map(item => ({ ...item, comprado: true })));
+
+      toast({
+        title: "Itens atualizados",
+        description: "Todos os itens foram marcados como comprados!",
+      });
+
+      return { error: null };
+    } catch (error: any) {
+      toast({
+        title: "Erro ao marcar itens",
+        description: error.message,
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
   useEffect(() => {
     fetchItensLista();
   }, []);
@@ -197,6 +224,7 @@ export const useListaCompras = () => {
     deleteItemLista,
     toggleItemComprado,
     limparItensComprados,
+    marcarTodosComoComprados,
     refetch: fetchItensLista
   };
 }; 

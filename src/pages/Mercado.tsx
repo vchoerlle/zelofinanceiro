@@ -47,7 +47,8 @@ const Mercado = () => {
     updateItemLista, 
     deleteItemLista, 
     toggleItemComprado,
-    limparItensComprados 
+    limparItensComprados,
+    marcarTodosComoComprados 
   } = useListaCompras();
 
   const [filtro, setFiltro] = useState("");
@@ -146,6 +147,16 @@ const Mercado = () => {
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Item
             </Button>
+            {itensLista.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={marcarTodosComoComprados}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Marcar todos como comprados
+              </Button>
+            )}
             {itensComprados.length > 0 && (
               <Button
                 variant="outline"

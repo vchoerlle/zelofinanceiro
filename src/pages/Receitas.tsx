@@ -37,6 +37,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useReceitas } from "@/hooks/useReceitas";
+import { StatusReceitaButton } from "@/components/StatusReceitaButton";
 import { EditarReceitaModal } from "@/components/EditarReceitaModal";
 import { SortableTableHead } from "@/components/SortableTableHead";
 import { useTableSort } from "@/hooks/useTableSort";
@@ -54,7 +55,7 @@ interface Receita {
 const Receitas = () => {
   const { toast } = useToast();
   const { categoriasReceita } = useCategorias();
-  const { receitas, createReceita, updateReceita, deleteReceita } =
+  const { receitas, createReceita, updateReceita, deleteReceita, updateReceitaStatus } =
     useReceitas();
   const [activeTab, setActiveTab] = useState("lista");
 
@@ -166,6 +167,10 @@ const Receitas = () => {
 
   const handleExcluirReceita = async (id: string) => {
     await deleteReceita(id);
+  };
+
+  const handleStatusChange = async (id: string, status: 'pendente' | 'recebida' | 'vencida') => {
+    await updateReceitaStatus(id, status);
   };
 
   // Função para aplicar filtro de data
@@ -469,7 +474,8 @@ const Receitas = () => {
                       >
                         Valor
                       </SortableTableHead>
-                      <TableHead className="text-center">Ações</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -504,7 +510,10 @@ const Receitas = () => {
                             minimumFractionDigits: 2,
                           })}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell>
+                          <StatusReceitaButton status={receita.status as any} onStatusChange={(s) => handleStatusChange(receita.id, s)} size="sm" />
+                        </TableCell>
+                        <TableCell>
                           <div className="flex items-center justify-center space-x-2">
                             <Button
                               variant="ghost"
@@ -603,14 +612,16 @@ const Receitas = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
                         <span className="font-bold text-green-600">
                           R${" "}
                           {receita.valor.toLocaleString("pt-BR", {
                             minimumFractionDigits: 2,
                           })}
                         </span>
-                        <div className="flex space-x-2">
+                          <div className="flex flex-col items-end space-y-2">
+                            <StatusReceitaButton status={receita.status as any} onStatusChange={(s) => handleStatusChange(receita.id, s)} size="sm" />
+                            <div className="flex space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -652,6 +663,7 @@ const Receitas = () => {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
+                            </div>
                         </div>
                       </div>
                     </div>

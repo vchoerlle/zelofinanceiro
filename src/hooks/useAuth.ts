@@ -18,6 +18,19 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Se o refresh token for inválido, limpar sessão local
+      if (event === 'TOKEN_REFRESHED' && !session) {
+        supabase.auth.signOut();
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('isAuthenticated');
+      }
+      if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('isAuthenticated');
+      }
     });
 
     // Get initial session
@@ -25,6 +38,12 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (!session) {
+        // sessão inválida no load inicial: limpar localStorage de compat
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('isAuthenticated');
+      }
     });
 
     return () => subscription.unsubscribe();

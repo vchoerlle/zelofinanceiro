@@ -628,11 +628,10 @@ const Despesas = () => {
                         sortKey="status"
                         currentSortDirection={getSortDirection('status')}
                         onSort={requestSort}
-                        className="text-center"
                       >
                         Status
                       </SortableTableHead>
-                      <TableHead className="text-center">Ações</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -667,14 +666,14 @@ const Despesas = () => {
                             minimumFractionDigits: 2,
                           })}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell>
                           <StatusDespesaButton
                             status={despesa.status}
                             onStatusChange={(status) => handleStatusChange(despesa.id, status)}
                             size="sm"
                           />
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell>
                           <div className="flex items-center justify-center space-x-2">
                             <Button
                               variant="ghost"
